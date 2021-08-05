@@ -75,7 +75,7 @@ def main():
                              """Defaults to 4.""")
 
     parser.add_option('-p',
-                      '--punctionation-chars',
+                      '--punctuation-chars',
                       dest = 'punctuation',
                       default = r"*(),;:",
                       metavar = "'CHARACTERS'",
