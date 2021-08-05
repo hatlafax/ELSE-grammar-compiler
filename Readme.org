@@ -30,8 +30,8 @@ This is work in progress and currently not for production use.
   =.lse= ELSE template file. Option =-l= specifies the ELSE language and therefore the name of the =.lse=
   file. 
 
-  Options =-p= and =-I=, punctuation characters and valid identifier characters are specified for the proper
-  ELSE language specification.
+  Options =-p= and =-I=, punctuation characters and valid identifier characters, respectively, are specified 
+  for the proper ELSE language specification.
 
   Finally, option =-v= causes the compiler to procuce verbose log ouput.
 
@@ -43,7 +43,7 @@ This is work in progress and currently not for production use.
   The compiler also allows batch processing of grammar files. This works for the grammar files provided 
   in the grammar directory, because the language option for these grammars is known by the compiler.
   However, this is useful for testing and not meant for final template file generation because additional
-  command lines are naively defaulted.
+  command line options, e.g. for punctuation, are naively defaulted.
 
   #+begin_example
   python Antlr4ToElseCompiler.py -i ./grammars -o ./out -b
@@ -60,7 +60,7 @@ This is work in progress and currently not for production use.
 - [[https://github.com/peter-milliken/ELSE][Emacs ELSE]] v2
 - [[https://github.com/antlr/grammars-v4][ANTLR v4 grammars]]
 
-  The grammars found in the grammar folder of this repository are copies from the [[https://github.com/antlr/grammars-v4][ANTLR v4 grammars].
+  The grammars found in the grammar folder of this repository are copies from the [[https://github.com/antlr/grammars-v4][ANTLR v4 grammars]].
   They are provided only for simplifying testing. They will not be synchronized with future changes.
 
   There is no single license for the grammars, each grammar has its own license. Check inside the grammar files for licensing terms.
@@ -80,5 +80,5 @@ This is work in progress and currently not for production use.
 
 - [[https://github.com/hatlafax/ELSE-grammar-compiler/blob/main/LICENSE][Boost Software License - Version 1.0 - August 17th, 2003]]
 
-- The grammars found in the grammar folder of this repository are copies from the [[https://github.com/antlr/grammars-v4][ANTLR v4 grammars].
+- The grammars found in the grammar folder of this repository are copies from the [[https://github.com/antlr/grammars-v4][ANTLR v4 grammars]].
   There is no single license for the grammars, each grammar has its own license. Check inside the grammar files for licensing terms.
