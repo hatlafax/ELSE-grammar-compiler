@@ -1,5 +1,7 @@
 #+HTML:<div align=center><a href="https://github.com/hatlafax/ELSE-grammar-compiler"><img alt="Emacs Logo" width="240" height="240" src="https://upload.wikimedia.org/wikipedia/commons/0/08/EmacsIcon.svg"></a>
 
+#+HTML:</div>
+
 * Antrl v4 grammar to Emacs ELSE template compiler
 
 This is prototype of a compiler that translate Antrl v4 language grammars to Emacs ELSE mode LSE template files.
