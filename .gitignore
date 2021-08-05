@@ -1,0 +1,9 @@
+*.pyc
+*.lse
+*.log
+*.tmp
+*.bak
+*~
+_*/
+__pycache__/
+out/
