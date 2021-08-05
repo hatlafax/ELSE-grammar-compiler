@@ -17,6 +17,38 @@ This is work in progress and currently not for production use.
   pip install antlr4-python3-runtime
   #+end_example
 
+* Usage
+
+  Get help about the command line options:
+
+  #+begin_example
+  python Antlr4ToElseCompiler.py -h
+  #+end_example
+
+  Typically used commands for compiling a grammar to an ELSE template lse file. Option =-i= specifies the
+  input directory for the =*.g4= grammar files. Option =-o= specifies the output directory for the produced
+  =.lse= ELSE template file. Option =-l= specifies the ELSE language and therefore the name of the =.lse=
+  file. 
+
+  Options =-p= and =-I=, punctuation characters and valid identifier characters are specified for the proper
+  ELSE language specification.
+
+  Finally, option =-v= causes the compiler to procuce verbose log ouput.
+
+  #+begin_example
+  python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l Python -p "*(),;:" -I "a-zA-Z_0-9-" Python3Parser.g4 Python3Lexer.g4
+  python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l Python -p "*(),;:" -I "a-zA-Z_0-9-" -v Python3Parser.g4 Python3Lexer.g4
+  #+end_example
+
+  The compiler also allows batch processing of grammar files. This works for the grammar files provided 
+  in the grammar directory, because the language option for these grammars is known by the compiler.
+  However, this is useful for testing and not meant for final template file generation because additional
+  command lines are naively defaulted.
+
+  #+begin_example
+  python Antlr4ToElseCompiler.py -i ./grammars -o ./out -b
+  #+end_example
+  
 * Dependencies
 - [[https://www.antlr.org/][ANTLR v4]] >= 4.9.2
 
@@ -42,6 +74,7 @@ This is work in progress and currently not for production use.
 * Limitations / Known Issues
 
 - Tested on Windows operating system only
+- LSE template files generated are semantically not usable.
 
 * License: Boost Software License 1.0
 
