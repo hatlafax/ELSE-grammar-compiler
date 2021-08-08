@@ -113,6 +113,36 @@ def main():
                       help = """Set the ELSE file copyright holder."""
                              """Defaults to 'Johannes Brunen <hatlafax@gmx.de>'.""")
 
+    parser.add_option('--indentation-token',
+                      dest = 'indentation_token',
+                      metavar = 'STRING',
+                      default = "INDENT",
+                      help = """In order to generate useful ELSE files, additional semantic"""
+                             """tokens for indentation can be embedded into the grammar."""
+                             """These tokens yield not in placeholders but modify a"""
+                             """placeholders content layout."""
+                      )
+
+    parser.add_option('--dedentation-token',
+                      dest = 'dedentation_token',
+                      metavar = 'STRING',
+                      default = "DEDENT",
+                      help = """In order to generate useful ELSE files, additional semantic"""
+                             """tokens for dedentation can be embedded into the grammar."""
+                             """These tokens yield not in placeholders but modify a"""
+                             """placeholders content layout."""
+                      )
+
+    parser.add_option('--newline-token',
+                      dest = 'newline_token',
+                      metavar = 'STRING',
+                      default = "NEWLINE",
+                      help = """In order to generate useful ELSE files, additional semantic"""
+                             """tokens for dedentation can be embedded into the grammar."""
+                             """These tokens yield not in placeholders but modify a"""
+                             """placeholders content layout."""
+                      )
+
     copyright = """;; Copyright (C) {copyright_holder}
 ;;
 ;; Author: {copyright_author},
@@ -175,6 +205,30 @@ Identifier"""
                       metavar = "'token1,token2,...'",
                       help = """Set the listener functions that are printed in verbose printing mode."""
                              """Defaults to: {print_tokens}""")
+
+    parser.add_option('-w',
+                      '--write-placeholders',
+                      dest = 'write_placeholders',
+                      default = False,
+                      action="store_true",
+                      help = """The compiler will write the file 'language.lst' to the output directory which"""
+                             """contains all placeholders that gets written to the '*.lse' output file. The option"""
+                             """'read-placeholders' allows to read a mapping file which can easily be generated"""
+                             """from this file."""
+                             """Defaults to: False""")
+
+    parser.add_option('-r',
+                      '--read-placeholders',
+                      dest = 'read_placeholders',
+                      default = False,
+                      action="store_true",
+                      help = """The compiler will read a mapping file 'language.lst' that does contain two columns in each line:"""
+                             """The first column contains the placeholder string, as written with option 'write-placeholders'."""
+                             """The second column contains the mapping used in the ELSE LSE generated file for the"""
+                             """placeholder. The two columns are expected to be separated by the following regular"""
+                             """expression: '\\s*=> ::\\s*'."""
+                             """Defaults to: False""")
+
 
     options, args = parser.parse_args(sys.argv[1:])
 
@@ -253,15 +307,14 @@ Identifier"""
 
         file_list = []
         for file in args:
-            
-            p, f = os.path.split(file)
+            _, f = os.path.split(file)
             file = os.path.join(options.input_dir, f)
 
             if os.path.exists(file):
                 file_list.append(file)
             else:
                 sys.exit(f"The input grammar file {file} does not exist!")
-                
+
         files.append(file_list)
         languages.append(language)
 
@@ -280,7 +333,34 @@ Identifier"""
 
     index_cnt = 0
 
+    patternPlaceholderMapping = re.compile(r'^\s*(.*?)\s*=> ::\s*(.*?)\s*$')
+
     for language, language_files in zip(languages, files):
+
+        options.placeholders = []
+        options.placeholders_map = {}
+
+        if options.read_placeholders:
+            input_file = language + '.map'
+            input_path = os.path.join(options.input_dir, input_file)
+
+            if os.path.exists(input_path):
+                with open(input_path, mode='r') as input:
+                    for line in input:
+                        line = line.rstrip()
+                        m = patternPlaceholderMapping.match(line)
+                        if m:
+                            key = m.group(1)
+                            val = m.group(2)
+                            options.placeholders_map[key] = val
+            else:
+                options.read_placeholders = False
+
+        if options.verbose and options.read_placeholders:
+            print ("---- placeholders --------------------------------------------------------------------------------")
+            for key, val in options.placeholders_map.items():
+                print(f"{key} => :: {val}")
+
         terminals = set()
         quotedTerminals = set()
         ruleSpec = {}
@@ -343,9 +423,17 @@ Identifier"""
 
                     tree = parser.grammarSpec()
 
-                    processListener = ProcessListener(options.print_tokens, output, language, options.punctuation, terminals, quotedTerminals, ruleSpec, lexerRuleSpec, quotedLexerRuleSpec, unquotedLexerRuleSpec)
+                    processListener = ProcessListener(options, output, language, terminals, quotedTerminals, ruleSpec, lexerRuleSpec, quotedLexerRuleSpec, unquotedLexerRuleSpec)
                     walker = ParseTreeWalker()
                     walker.walk(processListener, tree)
+
+        if options.write_placeholders:
+            output_file = language + '.lst'
+            output_path = os.path.join(options.output_dir, output_file)
+
+            with open(output_path, mode='w') as out:
+                for entry in options.placeholders:
+                    out.write(entry + '\n')
 
         if options.verbose:
             print ("---- quoteTerminals ------------------------------------------------------------------------------")

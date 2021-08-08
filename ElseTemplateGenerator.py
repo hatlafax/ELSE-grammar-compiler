@@ -32,6 +32,7 @@ class ElsePlaceholder:
     SubstituteType = Enum("SubstituteType", "AUTO_SUBSTITUTE NOAUTO_SUBSTITUTE")
     DuplicationType = Enum("DuplicationType", "CONTEXT_DEPENDENT VERTICAL HORIZONTAL")
     PlaceHolderType = Enum("PlaceHolderType", "TERMINAL NONTERMINAL MENU")
+    PlaceHolderMenuAttribute = Enum("PlaceHolderMenuAttribute", "PLACEHOLDER NOFOLLOW FOLLOW DESCRIPTION")
 
     def __init__(self, output, language: str) -> None:
         self.output: str = output
@@ -45,9 +46,9 @@ class ElsePlaceholder:
         self.substitute_count: int = 1
         self.description = ""
         self.duplication_type: DuplicationType = ElsePlaceholder.DuplicationType.CONTEXT_DEPENDENT
+        self.placeholder_menu_attributes: Dict[str, Set[PlaceHolderMenuAttribute]] = {}
         self.separator: str = ""
         self.content: str = ""
-
 
     def set_placeholder_name(self, placeholder_name: str) -> None:
         self.placeholder_name: str = placeholder_name
@@ -60,6 +61,23 @@ class ElsePlaceholder:
 
     def set_substitute_count(self, substitute_count: int) -> None:
         self.substitute_count: int = substitute_count
+
+    def add_placeholder_attribute(self, entry: str, placeholder_attribute: PlaceHolderMenuAttribute) -> None:
+        if entry not in self.placeholder_menu_attributes:
+            self.placeholder_menu_attributes[entry] = set()
+
+        self.placeholder_menu_attributes[entry].add(placeholder_attribute)
+
+    def remove_placeholder_attribute(self, entry: str, placeholder_attribute: PlaceHolderMenuAttribute) -> None:
+        if entry in self.placeholder_menu_attributes:
+            if placeholder_attribute in self.placeholder_menu_attributes[entry]:
+                self.placeholder_menu_attributes[entry].remove(placeholder_attribute)
+
+    def has_placeholder_attribute(self, entry, placeholder_attribute: PlaceHolderMenuAttribute) -> bool:
+        if entry in self.placeholder_menu_attributes:
+            if placeholder_attribute in self.placeholder_menu_attributes[entry]:
+                return True
+        return False
 
     def set_content(self, content: str) -> None:
         self.content: str = content
@@ -101,7 +119,14 @@ class ElsePlaceholder:
 
         #self.output.write('\n')
         for s in self.content.split('\n'):
-            self.output.write(f'    "{s}"\n')
+            if self.placeholder_type is ElsePlaceholder.PlaceHolderType.MENU:
+                menu_attributes = ""
+                if s in self.placeholder_menu_attributes:
+                    for attribute in self.placeholder_menu_attributes[s]:
+                        menu_attributes += f"/{attribute.name}"
+                self.output.write(f'    "{s}"{menu_attributes}\n')
+            else:
+                self.output.write(f'    "{s}"\n')
         #self.output.write('\n')
         self.output.write(     'END DEFINE\n\n')
 

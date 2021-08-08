@@ -1,3 +1,4 @@
+from PreProcessListener import PreProcessListener
 import re
 from enum import Enum
 from typing import TypeVar, Generic, List
@@ -12,23 +13,24 @@ class ProcessListener(ProcessListenerBase):
 
     patternRuleSpec = re.compile(r'^\s*(?:public|private|protected|fragment)?([A-Za-z0-9_]+)\s*:.*$')
     patternSeparator = re.compile(r'^([,;|:]\s*).*$')
+    patternMenuPlaceHolder = re.compile(r'^(:?\{.*\}|\[.*\])$')
 
     def __init__(self,
-                 printTokens,
+                 options,
                  output,
                  language,
-                 punctuation,
                  terminals,
                  quotedTerminals,
                  ruleSpec,
                  lexerRuleSpec,
                  quotedLexerRuleSpec,
                  unquotedLexerRuleSpec ) -> None:
-        super().__init__(printTokens)
+        super().__init__(options.print_tokens)
+
+        self.options = options
 
         self.output = output
         self.language = language
-        self.punctuation = punctuation
 
         self.terminals = terminals
         self.quotedTerminals = quotedTerminals
@@ -53,6 +55,11 @@ class ProcessListener(ProcessListenerBase):
 
     def processSuffix(self, ref, suffix) -> str:
         result = ""
+
+        if self.options.read_placeholders:
+            if ref in self.options.placeholders_map:
+                ref = self.options.placeholders_map[ref]
+
         if suffix:
             if suffix.getText() == '?':
                 result = '[' + ref + ']'
@@ -69,7 +76,13 @@ class ProcessListener(ProcessListenerBase):
         if atom.terminal():
             terminal = atom.terminal().getText()
 
-            if terminal in self.quotedLexerRuleSpec:
+            if terminal == self.options.indentation_token:
+                result = "indentation-token"
+            elif terminal == self.options.dedentation_token:
+                result = "dedentation-token"
+            elif terminal == self.options.newline_token:
+                result = "newline-token"
+            elif terminal in self.quotedLexerRuleSpec:
                 terminal = self.quotedLexerRuleSpec[terminal]
                 result = terminal[1:-1]
             elif terminal in self.unquotedLexerRuleSpec:
@@ -102,6 +115,11 @@ class ProcessListener(ProcessListenerBase):
     def createElseTerminalPlaceholder(self, placeholder_name) -> None:
         if placeholder_name not in self._list_placeholders:
             self._list_placeholders.append(placeholder_name)
+            self.options.placeholders.append(placeholder_name)
+
+            if self.options.read_placeholders:
+                if placeholder_name in self.options.placeholders_map:
+                    placeholder_name = self.options.placeholders_map[placeholder_name]
 
             placeholder: ElsePlaceholder = ElsePlaceholder(self.output, self.language)
             placeholder.set_placeholder_name(placeholder_name)
@@ -109,9 +127,16 @@ class ProcessListener(ProcessListenerBase):
             placeholder.set_content(f"Enter a valid {placeholder_name} terminal.")
             placeholder.write()
 
+            self.log(f"createElseTerminalPlaceholder -> {placeholder_name}", indentation = 2)
+
     def createElseNonTerminalPlaceholder(self, placeholder_name, content) -> None:
         if placeholder_name not in self._list_placeholders:
             self._list_placeholders.append(placeholder_name)
+            self.options.placeholders.append(placeholder_name)
+
+            if self.options.read_placeholders:
+                if placeholder_name in self.options.placeholders_map:
+                    placeholder_name = self.options.placeholders_map[placeholder_name]
 
             placeholder: ElsePlaceholder = ElsePlaceholder(self.output, self.language)
             placeholder.set_placeholder_name(placeholder_name)
@@ -127,9 +152,16 @@ class ProcessListener(ProcessListenerBase):
 
             placeholder.write()
 
+            self.log(f"createElseNonTerminalPlaceholder -> {placeholder_name} -> {content}", indentation = 2)
+
     def createElseMenuPlaceholder(self, placeholder_name, alternatives) -> None:
         if placeholder_name not in self._list_placeholders:
             self._list_placeholders.append(placeholder_name)
+            self.options.placeholders.append(placeholder_name)
+
+            if self.options.read_placeholders:
+                if placeholder_name in self.options.placeholders_map:
+                    placeholder_name = self.options.placeholders_map[placeholder_name]
 
             placeholder: ElsePlaceholder = ElsePlaceholder(self.output, self.language)
             placeholder.set_placeholder_name(placeholder_name)
@@ -137,13 +169,24 @@ class ProcessListener(ProcessListenerBase):
 
             content = ""
             for idx in range(len(alternatives)):
+                alternative = alternatives[idx]
+
+                m = ProcessListener.patternMenuPlaceHolder.match(alternative)
+                if m:
+                    alternative = alternative[1:-1]
+                    placeholder.add_placeholder_attribute(alternative, ElsePlaceholder.PlaceHolderMenuAttribute.PLACEHOLDER)
+
                 if idx == 0:
-                    content += alternatives[idx]
+                    content += alternative
                 else:
-                    content += "\n" + alternatives[idx]
+                    content += "\n" + alternative
 
             placeholder.set_content(content)
             placeholder.write()
+
+            self.log(f"createElseMenuPlaceholder -> {placeholder_name} ->", indentation = 2)
+            for entry in re.split(r',\s*\n|[\n]', content):
+                self.log(f"{entry}", indentation = 3)
 
     #
     # Antlr listener APIs
@@ -193,6 +236,7 @@ class ProcessListener(ProcessListenerBase):
     def exitRuleAltList(self, ctx:ANTLRv4Parser.RuleAltListContext):
         super().exitRuleAltList(ctx)
 
+
     # Enter a parse tree produced by ANTLRv4Parser#labeledAlt.
     def enterLabeledAlt(self, ctx:ANTLRv4Parser.LabeledAltContext):
         super().enterLabeledAlt(ctx)
@@ -238,10 +282,12 @@ class ProcessListener(ProcessListenerBase):
                     if len(alternative) == 0:
                         alternative = element
                     else:
-                        if element in self.punctuation or alternative[-1] in self.punctuation:
+                        if element in self.options.punctuation or alternative[-1] in self.options.punctuation:
                             alternative += element
                         else:
                             alternative += " " + element
+
+            self.log(f"alternative -> {alternative}", indentation = 2)
 
             if len(alternative) > 0:
                 self._stack_alternatives.top().append(alternative)
@@ -264,6 +310,8 @@ class ProcessListener(ProcessListenerBase):
 
             elif ctx.ebnf():
                 element = self.processEbnf(ctx.ebnf())
+
+            self.log(f"element -> {element}", indentation = 1)
 
             self._stack_elements.top().append(element)
 
