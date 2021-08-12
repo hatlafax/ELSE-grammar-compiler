@@ -35,10 +35,12 @@ class ProcessListenerBase(ANTLRv4ParserListener):
     """Process the AST.
     """
 
-    def __init__(self, printTokens) -> None:
+    def __init__(self, printTokens, verbose) -> None:
         super().__init__()
 
+
         self.printTokens = printTokens
+        self.verbose = verbose
 
         self._spaces_stack: Stack[str] = Stack()
         self._spaces_stack.push("")
@@ -55,7 +57,7 @@ class ProcessListenerBase(ANTLRv4ParserListener):
         self._spaces_stack.pop()
 
     def log(self, s, indentation = 0):
-        if self.options.verbose:
+        if self.verbose:
             try:
                 self.indent(indentation)
                 print(f"{self.spaces()}=> " + s)

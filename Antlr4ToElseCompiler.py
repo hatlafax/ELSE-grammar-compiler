@@ -229,6 +229,16 @@ Identifier"""
                              """expression: '\\s*=> ::\\s*'."""
                              """Defaults to: False""")
 
+    parser.add_option('-E',
+                      '--terminal-tokens',
+                      dest = 'terminal_tokens',
+                      default = "",
+                      metavar = "'token1,token2,...'",
+                      help = """Set the terminal tokens that leads to ELSE terminal placeholders."""
+                             """In case that the grammar does not contain detail lexer specification a comma separated"""
+                             """list of terminals can be specified. Other non specified terminals are silently ignored."""
+                             """Defaults to empty string""")
+
 
     options, args = parser.parse_args(sys.argv[1:])
 
@@ -333,12 +343,24 @@ Identifier"""
 
     index_cnt = 0
 
+    terminalTokens = re.split(r',\s*\n|[,\n ]', options.terminal_tokens)
+
     patternPlaceholderMapping = re.compile(r'^\s*(.*?)\s*=> ::\s*(.*?)\s*$')
 
     for language, language_files in zip(languages, files):
 
         options.placeholders = []
         options.placeholders_map = {}
+        options.placeholders_set = set()
+        options.terminals = set()
+        options.quotedTerminals = set()
+        options.ruleSpec = {}
+        options.lexerRuleSpec = {}
+        options.quotedLexerRuleSpec = {}
+        options.unquotedLexerRuleSpec = {}
+
+        for t in terminalTokens:
+            options.placeholders_set.add(t)
 
         if options.read_placeholders:
             input_file = language + '.map'
@@ -361,12 +383,6 @@ Identifier"""
             for key, val in options.placeholders_map.items():
                 print(f"{key} => :: {val}")
 
-        terminals = set()
-        quotedTerminals = set()
-        ruleSpec = {}
-        lexerRuleSpec = {}
-        quotedLexerRuleSpec = {}
-        unquotedLexerRuleSpec = {}
 
         start_rule = None
         if options.verbose:
@@ -388,7 +404,7 @@ Identifier"""
 
                 tree = parser.grammarSpec()
 
-                preProcessListener = PreProcessListener(terminals, quotedTerminals, ruleSpec, lexerRuleSpec, quotedLexerRuleSpec, unquotedLexerRuleSpec)
+                preProcessListener = PreProcessListener(options)
                 walker = ParseTreeWalker()
                 walker.walk(preProcessListener, tree)
 
@@ -423,7 +439,7 @@ Identifier"""
 
                     tree = parser.grammarSpec()
 
-                    processListener = ProcessListener(options, output, language, terminals, quotedTerminals, ruleSpec, lexerRuleSpec, quotedLexerRuleSpec, unquotedLexerRuleSpec)
+                    processListener = ProcessListener(options, output, language)
                     walker = ParseTreeWalker()
                     walker.walk(processListener, tree)
 
@@ -440,7 +456,7 @@ Identifier"""
 
             out = []
 
-            for t in quotedTerminals:
+            for t in options.quotedTerminals:
                 out.append(t)
 
             for e in sorted(out):
@@ -450,7 +466,7 @@ Identifier"""
 
             out = []
 
-            for t in terminals:
+            for t in options.terminals:
                 out.append(t)
 
             for e in sorted(out):
@@ -461,7 +477,7 @@ Identifier"""
 
             out = []
 
-            for key, value in lexerRuleSpec.items():
+            for key, value in options.lexerRuleSpec.items():
                 out.append(key + ": " +  value)
 
             for e in sorted(out):
@@ -471,7 +487,7 @@ Identifier"""
 
             out = []
 
-            for key, value in quotedLexerRuleSpec.items():
+            for key, value in options.quotedLexerRuleSpec.items():
                 out.append(key + ": " +  value)
 
             for e in sorted(out):
@@ -481,7 +497,7 @@ Identifier"""
 
             out = []
 
-            for key, value in unquotedLexerRuleSpec.items():
+            for key, value in options.unquotedLexerRuleSpec.items():
                 out.append(key + ": " +  value)
 
             for e in sorted(out):
@@ -491,12 +507,21 @@ Identifier"""
 
             out = []
 
-            for key, value in ruleSpec.items():
+            for key, value in options.ruleSpec.items():
                 out.append(key +  ": " + value)
 
             for e in sorted(out):
                 print(e)
 
+            print ("---- placeholders -------------------------------------------------------------------------------")
+
+            out = []
+
+            for t in options.placeholders_set:
+                out.append(t)
+
+            for e in sorted(out):
+                print(e)
 
             print("")
 

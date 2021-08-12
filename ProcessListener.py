@@ -15,29 +15,13 @@ class ProcessListener(ProcessListenerBase):
     patternSeparator = re.compile(r'^([,;|:]\s*).*$')
     patternMenuPlaceHolder = re.compile(r'^(:?\{.*\}|\[.*\])$')
 
-    def __init__(self,
-                 options,
-                 output,
-                 language,
-                 terminals,
-                 quotedTerminals,
-                 ruleSpec,
-                 lexerRuleSpec,
-                 quotedLexerRuleSpec,
-                 unquotedLexerRuleSpec ) -> None:
-        super().__init__(options.print_tokens)
+    def __init__(self, options, output, language) -> None:
+        super().__init__(options.print_tokens, options.verbose)
 
-        self.options = options
+        self._options = options
 
-        self.output = output
-        self.language = language
-
-        self.terminals = terminals
-        self.quotedTerminals = quotedTerminals
-        self.ruleSpec = ruleSpec
-        self.lexerRuleSpec = lexerRuleSpec
-        self.quotedLexerRuleSpec = quotedLexerRuleSpec
-        self.unquotedLexerRuleSpec = unquotedLexerRuleSpec
+        self._output = output
+        self._language = language
 
         self._isParserRuleSpec = False
 
@@ -47,8 +31,7 @@ class ProcessListener(ProcessListenerBase):
         self._stack_alternatives: Stack[List[str]] = Stack()
         self._stack_elements: Stack[List[str]] = Stack()
 
-        self._list_placeholders: List[str] = []
-
+        self._set_placeholders: Set[str] = set()
     #
     # Helper functions
     #
@@ -56,9 +39,9 @@ class ProcessListener(ProcessListenerBase):
     def processSuffix(self, ref, suffix) -> str:
         result = ""
 
-        if self.options.read_placeholders:
-            if ref in self.options.placeholders_map:
-                ref = self.options.placeholders_map[ref]
+        if self._options.read_placeholders:
+            if ref in self._options.placeholders_map:
+                ref = self._options.placeholders_map[ref]
 
         if suffix:
             if suffix.getText() == '?':
@@ -76,19 +59,19 @@ class ProcessListener(ProcessListenerBase):
         if atom.terminal():
             terminal = atom.terminal().getText()
 
-            if terminal == self.options.indentation_token:
+            if terminal == self._options.indentation_token:
                 result = "indentation-token"
-            elif terminal == self.options.dedentation_token:
+            elif terminal == self._options.dedentation_token:
                 result = "dedentation-token"
-            elif terminal == self.options.newline_token:
+            elif terminal == self._options.newline_token:
                 result = "newline-token"
-            elif terminal in self.quotedLexerRuleSpec:
-                terminal = self.quotedLexerRuleSpec[terminal]
+            elif terminal in self._options.quotedLexerRuleSpec:
+                terminal = self._options.quotedLexerRuleSpec[terminal]
                 result = terminal[1:-1]
-            elif terminal in self.unquotedLexerRuleSpec:
+            elif terminal in self._options.unquotedLexerRuleSpec:
                 self.createElseTerminalPlaceholder(terminal)
                 result = self.processSuffix(terminal, suffix)
-            elif terminal in self.quotedTerminals:
+            elif terminal in self._options.quotedTerminals:
                 result = terminal[1:-1]
         elif atom.ruleref():
             ruleref = atom.ruleref().getText()
@@ -113,15 +96,15 @@ class ProcessListener(ProcessListenerBase):
     #
 
     def createElseTerminalPlaceholder(self, placeholder_name) -> None:
-        if placeholder_name not in self._list_placeholders:
-            self._list_placeholders.append(placeholder_name)
-            self.options.placeholders.append(placeholder_name)
+        if placeholder_name not in self._set_placeholders:
+            self._set_placeholders.add(placeholder_name)
+            self._options.placeholders.append(placeholder_name)
 
-            if self.options.read_placeholders:
-                if placeholder_name in self.options.placeholders_map:
-                    placeholder_name = self.options.placeholders_map[placeholder_name]
+            if self._options.read_placeholders:
+                if placeholder_name in self._options.placeholders_map:
+                    placeholder_name = self._options.placeholders_map[placeholder_name]
 
-            placeholder: ElsePlaceholder = ElsePlaceholder(self.output, self.language)
+            placeholder: ElsePlaceholder = ElsePlaceholder(self._output, self._language)
             placeholder.set_placeholder_name(placeholder_name)
             placeholder.set_placeholder_type(ElsePlaceholder.PlaceHolderType.TERMINAL)
             placeholder.set_content(f"Enter a valid {placeholder_name} terminal.")
@@ -130,15 +113,15 @@ class ProcessListener(ProcessListenerBase):
             self.log(f"createElseTerminalPlaceholder -> {placeholder_name}", indentation = 2)
 
     def createElseNonTerminalPlaceholder(self, placeholder_name, content) -> None:
-        if placeholder_name not in self._list_placeholders:
-            self._list_placeholders.append(placeholder_name)
-            self.options.placeholders.append(placeholder_name)
+        if placeholder_name not in self._set_placeholders:
+            self._set_placeholders.add(placeholder_name)
+            self._options.placeholders.append(placeholder_name)
 
-            if self.options.read_placeholders:
-                if placeholder_name in self.options.placeholders_map:
-                    placeholder_name = self.options.placeholders_map[placeholder_name]
+            if self._options.read_placeholders:
+                if placeholder_name in self._options.placeholders_map:
+                    placeholder_name = self._options.placeholders_map[placeholder_name]
 
-            placeholder: ElsePlaceholder = ElsePlaceholder(self.output, self.language)
+            placeholder: ElsePlaceholder = ElsePlaceholder(self._output, self._language)
             placeholder.set_placeholder_name(placeholder_name)
             placeholder.set_placeholder_type(ElsePlaceholder.PlaceHolderType.NONTERMINAL)
             placeholder.set_content(content)
@@ -155,15 +138,15 @@ class ProcessListener(ProcessListenerBase):
             self.log(f"createElseNonTerminalPlaceholder -> {placeholder_name} -> {content}", indentation = 2)
 
     def createElseMenuPlaceholder(self, placeholder_name, alternatives) -> None:
-        if placeholder_name not in self._list_placeholders:
-            self._list_placeholders.append(placeholder_name)
-            self.options.placeholders.append(placeholder_name)
+        if placeholder_name not in self._set_placeholders:
+            self._set_placeholders.add(placeholder_name)
+            self._options.placeholders.append(placeholder_name)
 
-            if self.options.read_placeholders:
-                if placeholder_name in self.options.placeholders_map:
-                    placeholder_name = self.options.placeholders_map[placeholder_name]
+            if self._options.read_placeholders:
+                if placeholder_name in self._options.placeholders_map:
+                    placeholder_name = self._options.placeholders_map[placeholder_name]
 
-            placeholder: ElsePlaceholder = ElsePlaceholder(self.output, self.language)
+            placeholder: ElsePlaceholder = ElsePlaceholder(self._output, self._language)
             placeholder.set_placeholder_name(placeholder_name)
             placeholder.set_placeholder_type(ElsePlaceholder.PlaceHolderType.MENU)
 
@@ -172,7 +155,7 @@ class ProcessListener(ProcessListenerBase):
                 alternative = alternatives[idx]
 
                 m = ProcessListener.patternMenuPlaceHolder.match(alternative)
-                if m:
+                if m and alternative[1:-1] in self._options.placeholders_set:
                     alternative = alternative[1:-1]
                     placeholder.add_placeholder_attribute(alternative, ElsePlaceholder.PlaceHolderMenuAttribute.PLACEHOLDER)
 
@@ -282,7 +265,7 @@ class ProcessListener(ProcessListenerBase):
                     if len(alternative) == 0:
                         alternative = element
                     else:
-                        if element in self.options.punctuation or alternative[-1] in self.options.punctuation:
+                        if element in self._options.punctuation or alternative[-1] in self._options.punctuation:
                             alternative += element
                         else:
                             alternative += " " + element
