@@ -442,6 +442,7 @@ Identifier"""
                     processListener = ProcessListener(options, output, language)
                     walker = ParseTreeWalker()
                     walker.walk(processListener, tree)
+                    processListener.write_else_template()
 
         if options.write_placeholders:
             output_file = language + '.lst'

@@ -32,6 +32,7 @@ class ProcessListener(ProcessListenerBase):
         self._stack_elements: Stack[List[str]] = Stack()
 
         self._set_placeholders: Set[str] = set()
+        self._dict_placeholders = dict()
     #
     # Helper functions
     #
@@ -69,7 +70,7 @@ class ProcessListener(ProcessListenerBase):
                 terminal = self._options.quotedLexerRuleSpec[terminal]
                 result = terminal[1:-1]
             elif terminal in self._options.unquotedLexerRuleSpec:
-                self.createElseTerminalPlaceholder(terminal)
+                self._dict_placeholders[terminal] = None
                 result = self.processSuffix(terminal, suffix)
             elif terminal in self._options.quotedTerminals:
                 result = terminal[1:-1]
@@ -207,9 +208,9 @@ class ProcessListener(ProcessListenerBase):
                 placeholder_name = self._stack_placeholders.pop()
 
                 if len(alternatives) == 1:
-                    self.createElseNonTerminalPlaceholder(placeholder_name, alternatives[0])
+                    self._dict_placeholders[placeholder_name] = alternatives[0]
                 elif len(alternatives) > 1:
-                    self.createElseMenuPlaceholder(placeholder_name, alternatives)
+                    self._dict_placeholders[placeholder_name] = alternatives
 
     # Enter a parse tree produced by ANTLRv4Parser#ruleAltList.
     def enterRuleAltList(self, ctx:ANTLRv4Parser.RuleAltListContext):
@@ -364,9 +365,9 @@ class ProcessListener(ProcessListenerBase):
                 placeholder_name = self._stack_placeholders.pop()
 
                 if len(alternatives) == 1:
-                    self.createElseNonTerminalPlaceholder(placeholder_name, alternatives[0])
+                    self._dict_placeholders[placeholder_name] = alternatives[0]
                 elif len(alternatives) > 1:
-                    self.createElseMenuPlaceholder(placeholder_name, alternatives)
+                    self._dict_placeholders[placeholder_name] = alternatives
 
 
     # Enter a parse tree produced by ANTLRv4Parser#ruleref.
@@ -385,3 +386,13 @@ class ProcessListener(ProcessListenerBase):
     # Exit a parse tree produced by ANTLRv4Parser#terminal.
     def exitTerminal(self, ctx:ANTLRv4Parser.TerminalContext):
         super().exitTerminal(ctx)
+
+
+    def write_else_template(self) -> None:
+        for placeholder_name, content in self._dict_placeholders.items():
+            if content is None:
+                self.createElseTerminalPlaceholder(placeholder_name)
+            elif isinstance(content, str):
+                self.createElseNonTerminalPlaceholder(placeholder_name, content)
+            elif isinstance(content, list):
+                self.createElseMenuPlaceholder(placeholder_name, content)
