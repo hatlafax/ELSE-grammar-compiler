@@ -440,6 +440,15 @@ class ANTLRv4ParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ANTLRv4Parser#elements.
+    def enterElements(self, ctx:ANTLRv4Parser.ElementsContext):
+        pass
+
+    # Exit a parse tree produced by ANTLRv4Parser#elements.
+    def exitElements(self, ctx:ANTLRv4Parser.ElementsContext):
+        pass
+
+
     # Enter a parse tree produced by ANTLRv4Parser#labeledElement.
     def enterLabeledElement(self, ctx:ANTLRv4Parser.LabeledElementContext):
         pass

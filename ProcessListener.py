@@ -33,6 +33,8 @@ class ProcessListener(ProcessListenerBase):
 
         self._set_placeholders: Set[str] = set()
         self._dict_placeholders = dict()
+
+        self._dict_placeholders_separators: dict[str, str] = dict()
     #
     # Helper functions
     #
@@ -79,6 +81,35 @@ class ProcessListener(ProcessListenerBase):
             result = self.processSuffix(ruleref, suffix)
         return result
 
+    def processElements(self, elements) -> str:
+        result = ""
+        separator = elements.terminal().getText()
+        if len(separator) >= 3:
+            separator = separator[1:-1]
+        ruleref = None
+        if elements.atom():
+            atom = elements.atom()
+            if atom.terminal():
+                terminal = atom.terminal().getText()
+
+                if terminal in self._options.unquotedLexerRuleSpec:
+                    self._dict_placeholders[terminal] = None
+                    ruleref = terminal
+
+            elif atom.ruleref():
+                ruleref = atom.ruleref().getText()
+
+        elif elements.block():
+            ruleref = elements.block().getText()
+
+        if ruleref is not None:
+            if ruleref not in self._dict_placeholders_separators:
+                self._dict_placeholders_separators[ruleref] = separator
+
+            result = '{' + ruleref + '}...'
+
+        return result
+
     def processEbnf(self, ebnf) -> str:
         result = ""
         if ebnf.block():
@@ -101,6 +132,8 @@ class ProcessListener(ProcessListenerBase):
             self._set_placeholders.add(placeholder_name)
             self._options.placeholders.append(placeholder_name)
 
+            separator = self._dict_placeholders_separators.get(placeholder_name, "")
+
             if self._options.read_placeholders:
                 if placeholder_name in self._options.placeholders_map:
                     placeholder_name = self._options.placeholders_map[placeholder_name]
@@ -109,6 +142,7 @@ class ProcessListener(ProcessListenerBase):
             placeholder.set_placeholder_name(placeholder_name)
             placeholder.set_placeholder_type(ElsePlaceholder.PlaceHolderType.TERMINAL)
             placeholder.set_content(f"Enter a valid {placeholder_name} terminal.")
+            placeholder.set_separator(separator)
             placeholder.write()
 
             self.log(f"createElseTerminalPlaceholder -> {placeholder_name}", indentation = 2)
@@ -117,6 +151,8 @@ class ProcessListener(ProcessListenerBase):
         if placeholder_name not in self._set_placeholders:
             self._set_placeholders.add(placeholder_name)
             self._options.placeholders.append(placeholder_name)
+
+            separator = self._dict_placeholders_separators.get(placeholder_name, "")
 
             if self._options.read_placeholders:
                 if placeholder_name in self._options.placeholders_map:
@@ -128,12 +164,12 @@ class ProcessListener(ProcessListenerBase):
             placeholder.set_content(content)
 
             m = ProcessListener.patternSeparator.match(content)
-            if m:
+            if m and len(separator) == 0:
                 separator = m.group(1)
                 if len(separator) == 1:
                     separator += " "
-                placeholder.set_separator(separator)
 
+            placeholder.set_separator(separator)
             placeholder.write()
 
             self.log(f"createElseNonTerminalPlaceholder -> {placeholder_name} -> {content}", indentation = 2)
@@ -142,6 +178,8 @@ class ProcessListener(ProcessListenerBase):
         if placeholder_name not in self._set_placeholders:
             self._set_placeholders.add(placeholder_name)
             self._options.placeholders.append(placeholder_name)
+
+            separator = self._dict_placeholders_separators.get(placeholder_name, "")
 
             if self._options.read_placeholders:
                 if placeholder_name in self._options.placeholders_map:
@@ -166,6 +204,7 @@ class ProcessListener(ProcessListenerBase):
                     content += "\n" + alternative
 
             placeholder.set_content(content)
+            placeholder.set_separator(separator)
             placeholder.write()
 
             self.log(f"createElseMenuPlaceholder -> {placeholder_name} ->", indentation = 2)
@@ -289,6 +328,9 @@ class ProcessListener(ProcessListenerBase):
                 elif ctx.labeledElement().block():
                     element = self.processBlock(ctx.labeledElement().block(), ctx.ebnfSuffix())
 
+            elif ctx.elements():
+                element = self.processElements(ctx.elements())
+
             elif ctx.atom():
                 element = self.processAtom(ctx.atom(), ctx.ebnfSuffix())
 
@@ -302,6 +344,14 @@ class ProcessListener(ProcessListenerBase):
     # Exit a parse tree produced by ANTLRv4Parser#element.
     def exitElement(self, ctx:ANTLRv4Parser.ElementContext):
         super().exitElement(ctx)
+
+
+    def enterElements(self, ctx:ANTLRv4Parser.ElementsContext):
+        super().enterElements(ctx)
+
+    # Exit a parse tree produced by ANTLRv4Parser#elements.
+    def exitElements(self, ctx:ANTLRv4Parser.ElementsContext):
+        super().exitElements(ctx)
 
 
     # Enter a parse tree produced by ANTLRv4Parser#labeledElement.
@@ -389,6 +439,13 @@ class ProcessListener(ProcessListenerBase):
 
 
     def write_else_template(self) -> None:
+
+        for p, s in self._dict_placeholders_separators.items():
+            print(f"{p} -> {s}")
+
+        for placeholder_name, content in self._dict_placeholders.items():
+            print(f"placeholder_name: {placeholder_name}")
+
         for placeholder_name, content in self._dict_placeholders.items():
             if content is None:
                 self.createElseTerminalPlaceholder(placeholder_name)

@@ -5,13 +5,13 @@ file: statements? ENDMARKER;
 func_type: '(' type_expressions? ')' '->' expression NEWLINE* ENDMARKER;
 
 type_expressions:
-      ','.expression+ ',' '*' expression ',' '**' expression 
-    | ','.expression+ ',' '*' expression 
-    | ','.expression+ ',' '**' expression 
+      (expression (',' expression)*) ',' '*' expression ',' '**' expression 
+    | (expression (',' expression)*) ',' '*' expression 
+    | (expression (',' expression)*) ',' '**' expression 
     | '*' expression ',' '**' expression 
     | '*' expression 
     | '**' expression 
-    | ','.expression+
+    | (expression (',' expression)*)
     ;
 
 statements: statement+;
@@ -20,7 +20,7 @@ statement: compound_stmt | simple_stmt;
 
 simple_stmt:
       small_stmt NEWLINE
-    | ';'.small_stmt+ ';'? NEWLINE 
+    | (small_stmt (';' small_stmt)*) ';'? NEWLINE 
     ;
 
 small_stmt:
@@ -72,9 +72,9 @@ augassign:
     | '//=' 
     ;
 
-global_stmt: 'global' ','.NAME+;
+global_stmt: 'global' (NAME (',' NAME)*);
 
-nonlocal_stmt: 'nonlocal' ','.NAME+;
+nonlocal_stmt: 'nonlocal' (NAME (',' NAME)*);
 
 yield_stmt: yield_expr;
 
@@ -100,7 +100,7 @@ import_from_targets:
     ;
 
 import_from_as_names:
-      ','.import_from_as_name+ 
+      (import_from_as_name (',' import_from_as_name)*) 
     ;
 
 import_from_as_name:
@@ -142,10 +142,10 @@ for_stmt:
     ;
 
 with_stmt:
-      'with' '(' ','.with_item+ ','? ')' ':' block 
-    | 'with' ','.with_item+ ':' TYPE_COMMENT? block 
-    | 'async' 'with' '(' ','.with_item+ ','? ')' ':' block 
-    | 'async' 'with' ','.with_item+ ':' TYPE_COMMENT? block 
+      'with' '(' (with_item (',' with_item)*) ','? ')' ':' block 
+    | 'with' (with_item (',' with_item)*) ':' TYPE_COMMENT? block 
+    | 'async' 'with' '(' (with_item (',' with_item)*) ','? ')' ':' block 
+    | 'async' 'with' (with_item (',' with_item)*) ':' TYPE_COMMENT? block 
     ;
 
 with_item:
@@ -263,7 +263,7 @@ star_expression:
     | expression
     ;
 
-star_named_expressions: ','.star_named_expression+ ','?;
+star_named_expressions: (star_named_expression (',' star_named_expression)*) ','?;
 
 star_named_expression:
       '*' bitwise_or 
@@ -453,7 +453,7 @@ primary:
 
 slices:
       slice
-    | ','.slice+ ','?
+    | (slice (',' slice)*) ','?
     ;
 
 slice:
@@ -511,7 +511,7 @@ dictcomp:
       '{' kvpair for_if_clauses '}' 
     ;
 
-double_starred_kvpairs: ','.double_starred_kvpair+ ','?;
+double_starred_kvpairs: (double_starred_kvpair (',' double_starred_kvpair)*) ','?;
 
 double_starred_kvpair:
       '**' bitwise_or 
@@ -539,14 +539,14 @@ arguments:
     ;
 
 args:
-      ','.(starred_expression | named_expression)+ (',' kwargs)?
+      ((starred_expression | named_expression) (',' (starred_expression | named_expression))*) (',' kwargs)?
     | kwargs 
     ;
 
 kwargs:
-      ','.kwarg_or_starred+ ',' ','.kwarg_or_double_starred+ 
-    | ','.kwarg_or_starred+
-    | ','.kwarg_or_double_starred+
+      (kwarg_or_starred (',' kwarg_or_starred)*) ',' (kwarg_or_double_starred (',' kwarg_or_double_starred)*) 
+    | (kwarg_or_starred (',' kwarg_or_starred)*)
+    | (kwarg_or_double_starred (',' kwarg_or_double_starred)*)
     ;
 
 starred_expression:
@@ -565,10 +565,10 @@ kwarg_or_double_starred:
 
 star_targets:
       star_target
-    | ','.star_target+ ','? 
+    | star_target (',' star_target)* ','? 
     ;
 
-star_targets_list_seq: ','.star_target+ ','?;
+star_targets_list_seq: (star_target (',' star_target)*) ','?;
 
 star_targets_tuple_seq:
       star_target (',' star_target)+ ','?
@@ -604,7 +604,7 @@ single_subscript_attribute_target:
     | t_primary '[' slices ']'
     ;
 
-del_targets: ','.del_target+ ','?;
+del_targets: (del_target (',' del_target)*) ','?;
 
 del_target:
       t_primary '.' NAME 
