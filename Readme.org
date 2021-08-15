@@ -14,7 +14,7 @@ This is work in progress and currently not for production use.
 - Install the antlr4 python runtime
 
   #+begin_example
-  pip install antlr4-python3-runtime
+pip install --user --upgrade antlr4-python3-runtime
   #+end_example
 
 * Usage
@@ -22,33 +22,75 @@ This is work in progress and currently not for production use.
   Get help about the command line options:
 
   #+begin_example
-  python Antlr4ToElseCompiler.py -h
+python Antlr4ToElseCompiler.py -h
   #+end_example
 
   Typically used commands for compiling a grammar to an ELSE template lse file. Option =-i= specifies the
   input directory for the =*.g4= grammar files. Option =-o= specifies the output directory for the produced
   =.lse= ELSE template file. Option =-l= specifies the ELSE language and therefore the name of the =.lse=
-  file. 
+  file.
 
-  Options =-p= and =-I=, punctuation characters and valid identifier characters, respectively, are specified 
+  Options =-p= and =-I=, punctuation characters and valid identifier characters, respectively, are specified
   for the proper ELSE language specification.
 
-  Finally, option =-v= causes the compiler to procuce verbose log ouput.
+  Option =-v= causes the compiler to procuce verbose log ouput. With additionally defining option =-T= a list
+  of listener handler names can be provided that allows to filter the verbose logging output.
 
   #+begin_example
-  python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l Python -p "*(),;:" -I "a-zA-Z_0-9-" Python3Parser.g4 Python3Lexer.g4
-  python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l Python -p "*(),;:" -I "a-zA-Z_0-9-" -v Python3Parser.g4 Python3Lexer.g4
+python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l Python -p '*(),;:' -I 'a-zA-Z_0-9-' Python3Parser.g4 Python3Lexer.g4
+python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l Python -p '*(),;:' -I 'a-zA-Z_0-9-' -v Python3Parser.g4 Python3Lexer.g4
   #+end_example
 
-  The compiler also allows batch processing of grammar files. This works for the grammar files provided 
+  The compiler also allows batch processing of grammar files. This works for the grammar files provided
   in the grammar directory, because the language option for these grammars is known by the compiler.
   However, this is useful for testing and not meant for final template file generation because additional
   command line options, e.g. for punctuation, are naively defaulted.
 
   #+begin_example
-  python Antlr4ToElseCompiler.py -i ./grammars -o ./out -b
+python Antlr4ToElseCompiler.py -i ./grammars -o ./out -b
   #+end_example
-  
+
+  Options =--indentation-token=, =--dedentation-token= and =--newline-token= allow the definition of a distinguished
+  lexer tokens that are used for shapeing the generated ELSE template lse file.
+
+  Options =-w= causes the compiler to generate a file /language.lst/ that list of all placeholders that finds its way
+  into the /language.lse/ template file. Starting from that, the user can create a mapping file /language.map/ of
+  placeholders that allows the definition of an alternative placeholder name that is then used in the /language.lse/
+  file to get a more pleasing template file. This mapping file is used when providing option =-r= to the compiler.
+
+  The mapping file contains exactly one line for each placeholder to be mapped with the old and new name separated
+  by a separator string ~=> ::~, that is:
+
+  ~placeholdder => :: mapped placeholder~
+
+  Example:  ~(s_expr ∣ n_expr) => :: s_or_n_expr~
+
+  Option =-x= causes the compiler to read a file /language.spc/ that has the same format as the /language.map/
+  file and defines exception rules on each line with respect to omitting space separator charactes between
+  parse tokens in the final ELSE template lse file.
+
+  Finally, option =-E= allows the definition of a list of terminal tokens for which the compiler should generate
+  terminal placeholder entries in the template lse file although the terminal specification is missing from the
+  grammar. This option is useful in case that you are dealing with a reduced grammar file without any lexer
+  information.
+
+  At last a complete command line used for the generation of a Python language LSE template file.
+
+  #+begin_example
+python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l Python -p '*(),;' -I 'a-zA-Z_0-9-' -w -r -x -v Python3Parser.g4 Python3Lexer.g4
+  #+end_example
+
+  with the following files involved:
+
+  | File               | Remark                                            | Read from   | Written to | Option |
+  |--------------------+---------------------------------------------------+-------------+------------+--------|
+  | =Python3Parser.g4= | The parsar [[https://github.com/antlr/grammars-v4][ANTLR v4 grammar]] file for Python 3.    | =./grammar= |            |        |
+  | =Python3Lexer.g4=  | The lexer [[https://github.com/antlr/grammars-v4][ANTLR v4 grammar]] file for Python 3.     | =./grammar= |            |        |
+  | =Python.lse=       | The generated [[https://github.com/peter-milliken/ELSE][Emacs ELSE]] v2 Python template file. |             | =./out=    |        |
+  | =Python.lst=       | The generated placeholder list.                   |             | =./out=    | =-w=   |
+  | =Python.map=       | The considered placeholder mapping file.          | =./grammar= |            | =-r=   |
+  | =Python.spc=       | The considered no space separator pattern file.   | =./grammar= |            | =-x=   |
+
 * Dependencies
 - [[https://www.antlr.org/][ANTLR v4]] >= 4.9.2
 
@@ -71,10 +113,39 @@ This is work in progress and currently not for production use.
 
  This is an experimental project. Do not rely on it. It is work in progress and it is open if this will lead to a valuable software component.
 
+* Remarks
+
+- This compiler builds on a modification of the original ANTLRv4 grammar (=ANTLRv4Lexer.g4, ANTLRv4Parser.g4=).
+  This modification implements an extension that is taken from [[https://www.python.org/dev/peps/pep-0617/][PEP 617 -- New PEG parser for CPython]]. This extension
+  allows the usage of the following grammar construct =s.e+= to express the equivalent construct =e (s e)*=.
+
+  Examples:
+  | Original construct                             | Extension construct      | LSE file entry           |
+  |------------------------------------------------+--------------------------+--------------------------|
+  | =(expression (',' expression)*)=               | =','.expression+=        | ={expression}...=        |
+  | =(small_stmt (';' small_stmt)*)=               | =';'.small_stmt+=        | ={small_stmt}...=        |
+  | =(NAME (',' NAME)*)=                           | =','.NAME+=              | ={NAME}...=              |
+  | =((s_expr ∣ n_expr) (',' (s_expr ∣ n_expr))*)= | =','.(s_expr ∣ n_expr)+= | ={(s_expr ∣ n_expr)}...= |
+
+
+- Python provides a [[https://docs.python.org/3.9/reference/grammar.html][full grammar specification]]. This specification (=./grammars/Python396.peg=) written in
+  a mixture of [[https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form][EBNF]] and [[https://en.wikipedia.org/wiki/Parsing_expression_grammar][PEG]] plus some handcrafted extensions detailed in [[https://www.python.org/dev/peps/pep-0617/][PEP 617 -- New PEG parser for CPython]]
+  is not directly usable by the compiler. The compiler only handles [[https://github.com/antlr/grammars-v4/tree/master/antlr/antlr4][ANTLR v4]] (extended by the s.e+ construnct)
+  out of the box. File =./grammars/Python396_Antlr.g4= contains a transformed version of this original Python PEG
+  grammar file. By comparing these two files, one can directly see the necessary transformation steps.
+
+
+- Finally, a language grammar does need some fine tuning in order to get a viable [[https://github.com/peter-milliken/ELSE][Emacs ELSE]] template file.
+  Newlines and indentation are of especially importance for that matter. The final grammar file is
+  =./grammar/Python396.g4=.
+
 * Limitations / Known Issues
 
-- Tested on Windows operating system only
-- LSE template files generated are semantically not usable.
+- Tested on Windows operating system only.
+
+
+- The generated LSE files nevertheless need additional handcrafting to be useful for Emacs usage.
+  However, the generated files  shorten the time to get a new proper template file considerably.
 
 * License: Boost Software License 1.0
 

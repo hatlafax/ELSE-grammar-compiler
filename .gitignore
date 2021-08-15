@@ -1,8 +1,10 @@
 *.pyc
 *.lse
+*.lst
 *.log
 *.tmp
 *.bak
+*.html
 *~
 _*/
 __pycache__/

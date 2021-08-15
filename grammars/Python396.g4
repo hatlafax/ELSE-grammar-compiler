@@ -1,8 +1,12 @@
 parser grammar Python396;
 
-file: statements? ENDMARKER;
+program:
+      statement*
+    ;
 
-func_type: '(' type_expressions? ')' '->' expression NEWLINE* ENDMARKER;
+func_type: 
+      '(' type_expressions? ')' '->' expression
+    ;
 
 type_expressions:
       ','.expression+ ',' '*' expression ',' '**' expression 
@@ -18,10 +22,7 @@ statements: statement+;
 
 statement: compound_stmt | simple_stmt;
 
-simple_stmt:
-      small_stmt NEWLINE
-    | ';'.small_stmt+ ';'? NEWLINE 
-    ;
+simple_stmt: ';'.small_stmt+;
 
 small_stmt:
       assignment
@@ -45,7 +46,9 @@ compound_stmt:
     | class_def
     | with_stmt
     | for_stmt
-    | try_stmt
+    | async_for_stmt
+    | try_finally_stmt
+    | try_except_else_finally_stmt
     | while_stmt
     ;
 
@@ -121,31 +124,52 @@ dotted_name:
     ;
 
 if_stmt:
-      'if' named_expression ':' block elif_stmt 
-    | 'if' named_expression ':' block else_block?
+      'if' named_expression ':' NEWLINE INDENT statement+ NEWLINE elif_stmt* NEWLINE else_block?
     ;
 
 elif_stmt:
-      'elif' named_expression ':' block elif_stmt 
-    | 'elif' named_expression ':' block else_block?
+      'elif' named_expression ':' NEWLINE INDENT statement+
     ;
 
-else_block: 'else' ':' block;
+else_block: 
+      'else' ':' NEWLINE INDENT statement+
+    ;
 
 while_stmt:
-      'while' named_expression ':' block else_block?
+      'while' named_expression ':' NEWLINE INDENT statement+ NEWLINE else_block?
     ;
 
 for_stmt:
-      'for' star_targets 'in' star_expressions ':' TYPE_COMMENT? block else_block?
-    | 'async' 'for' star_targets 'in' star_expressions ':' TYPE_COMMENT? block else_block?
+      'for' star_targets 'in' star_expressions ':' TYPE_COMMENT? NEWLINE INDENT statement+ NEWLINE else_block?
+    | 
+    ;
+
+async_for_stmt:
+        'async for' star_targets 'in' star_expressions ':' TYPE_COMMENT? NEWLINE INDENT statement+ NEWLINE else_block?
+    | 
     ;
 
 with_stmt:
-      'with' '(' ','.with_item+ ','? ')' ':' block 
-    | 'with' ','.with_item+ ':' TYPE_COMMENT? block 
-    | 'async' 'with' '(' ','.with_item+ ','? ')' ':' block 
-    | 'async' 'with' ','.with_item+ ':' TYPE_COMMENT? block 
+      with_non_braced_stmt
+    | with_braced_stmt
+    | async_with_non_braced_stmt
+    | async_with_braced_stmt
+    ;
+
+with_non_braced_stmt:
+      'with' ','.with_item+ ':' TYPE_COMMENT? NEWLINE INDENT statement+
+    ;
+
+with_braced_stmt:
+      'with' '(' ','.with_item+ ','? ')' ':' NEWLINE INDENT statement+
+    ;
+
+async_with_non_braced_stmt:
+      'async with' ','.with_item+ ':' TYPE_COMMENT? NEWLINE INDENT statement+
+    ;
+
+async_with_braced_stmt:
+      'async with' '(' ','.with_item+ ','? ')' ':' NEWLINE INDENT statement+
     ;
 
 with_item:
@@ -153,17 +177,30 @@ with_item:
     | expression 
     ;
 
-try_stmt:
-      'try' ':' block finally_block 
-    | 'try' ':' block except_block+ else_block? finally_block?
+try_finally_stmt:
+      'try' ':' NEWLINE INDENT statement+ NEWLINE finally_block 
+    ;
+
+try_except_else_finally_stmt:
+      'try' ':' NEWLINE INDENT statement+ NEWLINE except_block+ NEWLINE else_block? NEWLINE finally_block?
     ;
 
 except_block:
-      'except' expression ('as' NAME)? ':' block 
-    | 'except' ':' block 
+      except_block_expression_stmts
+    | except_block_stmts
     ;
 
-finally_block: 'finally' ':' block;
+except_block_expression_stmts:
+      'except' expression ('as' NAME)? ':' NEWLINE INDENT statement+
+    ;
+
+except_block_stmts:
+      'except' ':' NEWLINE INDENT statement+
+    ;
+
+finally_block:
+      'finally' ':' NEWLINE INDENT statement+
+    ;
 
 return_stmt:
       'return' star_expressions?
@@ -175,18 +212,19 @@ raise_stmt:
     ;
 
 function_def:
-      decorators function_def_raw 
-    | function_def_raw
+      decorator* NEWLINE (function_def_raw | function_async_def_raw)
     ;
 
 function_def_raw:
-      'def' NAME '(' parameters? ')' ('->' expression)? ':' func_type_comment? block 
-    | 'async' 'def' NAME '(' parameters? ')' ('->' expression)? ':' func_type_comment? block 
+      'def' NAME '(' parameters? ')' ('->' expression)? ':' func_type_comment? NEWLINE INDENT statement+
+    ;
+
+function_async_def_raw:
+      'async def' NAME '(' parameters? ')' ('->' expression)? ':' func_type_comment? NEWLINE INDENT statement+
     ;
 
 func_type_comment:
-      NEWLINE TYPE_COMMENT
-    | TYPE_COMMENT
+      '#' STRING
     ;
 
 parameters:
@@ -236,20 +274,14 @@ annotation: ':' expression;
 
 default: '=' expression;
 
-decorators: ('@' named_expression NEWLINE)+;
+decorator: ('@' named_expression);
 
 class_def:
-      decorators class_def_raw 
-    | class_def_raw
+      decorator* NEWLINE class_def_raw 
     ;
 
 class_def_raw:
-      'class' NAME ('(' arguments? ')')? ':' block 
-    ;
-
-block:
-      NEWLINE INDENT statements DEDENT 
-    | simple_stmt
+      'class' NAME ('(' arguments? ')')? ':' NEWLINE INDENT statement+ 
     ;
 
 star_expressions:
@@ -625,4 +657,8 @@ t_primary:
     | t_primary genexp 
     | t_primary '(' arguments? ')' 
     | atom 
+    ;
+
+LAMBDA_PARAM:
+      STRING
     ;

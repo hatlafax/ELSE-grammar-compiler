@@ -1,10 +1,3 @@
-##
-## pip install antlr4-python3-runtime
-## antlr4.bat -o . -Dlanguage=Python3 ANTLRv4Lexer.g4
-## antlr4.bat -o . -Dlanguage=Python3 ANTLRv4Parser.g4
-## c:/Utils/Python385/python.exe TestAntlr.py ./examples/Hello.g4
-##
-
 import sys, re, os
 from enum import Enum
 from typing import NoReturn
@@ -240,6 +233,19 @@ Identifier"""
                              """list of terminals can be specified. Other non specified terminals are silently ignored."""
                              """Defaults to empty string""")
 
+    parser.add_option('-x',
+                      '--non-space-separated',
+                      dest = 'non_space_separated',
+                      default = False,
+                      action="store_true",
+                      help = """The compiler will read the file 'language.spc'. This file provides character pairs,"""
+                             """one in each line that specifify token elements that should not be separated by a"""
+                             """space character. E.g. a line entry '},' would cause the compiler to omit the default"""
+                             """space charcter between any two parser elements where the first ends with the curly"""
+                             """bracket character and the second starts with the comma character."""
+                             """This allows to get control over the final ELSE LSE template file layout."""
+                             """Defaults to: False""")
+
 
     options, args = parser.parse_args(sys.argv[1:])
 
@@ -346,7 +352,7 @@ Identifier"""
 
     terminalTokens = re.split(r',\s*\n|[,\n ]', options.terminal_tokens)
 
-    patternPlaceholderMapping = re.compile(r'^\s*(.*?)\s*=> ::\s*(.*?)\s*$')
+    patternMapping = re.compile(r'^\s*(.*?)\s*=> ::\s*(.*?)\s*$')
 
     for language, language_files in zip(languages, files):
 
@@ -359,6 +365,7 @@ Identifier"""
         options.lexerRuleSpec = {}
         options.quotedLexerRuleSpec = {}
         options.unquotedLexerRuleSpec = {}
+        options.non_space_separated_map: Dict[str, List[str]] = {}
 
         for t in terminalTokens:
             options.placeholders_set.add(t)
@@ -371,11 +378,12 @@ Identifier"""
                 with open(input_path, mode='r') as input:
                     for line in input:
                         line = line.rstrip()
-                        m = patternPlaceholderMapping.match(line)
-                        if m:
-                            key = m.group(1)
-                            val = m.group(2)
-                            options.placeholders_map[key] = val
+                        if not line.startswith('#'):
+                            m = patternMapping.match(line)
+                            if m:
+                                key = m.group(1)
+                                val = m.group(2)
+                                options.placeholders_map[key] = val
             else:
                 options.read_placeholders = False
 
@@ -384,6 +392,29 @@ Identifier"""
             for key, val in options.placeholders_map.items():
                 print(f"{key} => :: {val}")
 
+        if options.non_space_separated:
+            input_file = language + '.spc'
+            input_path = os.path.join(options.input_dir, input_file)
+
+            if os.path.exists(input_path):
+                with open(input_path, mode='r') as input:
+                    for line in input:
+                        line = line.rstrip()
+                        if not line.startswith('#'):
+                            m = patternMapping.match(line)
+                            if m:
+                                lhs = m.group(1)
+                                rhs = m.group(2)
+                                if lhs in options.non_space_separated_map:
+                                    options.non_space_separated_map[lhs].append(rhs)
+                                else:
+                                    options.non_space_separated_map[lhs] = list(rhs)
+
+        if options.verbose and options.non_space_separated:
+            print ("---- non space parser token separation -----------------------------------------------------------")
+            for lhs, val in options.non_space_separated_map.items():
+                for rhs in val:
+                    print(f"'{lhs}' => :: '{rhs}'")
 
         start_rule = None
         if options.verbose:
