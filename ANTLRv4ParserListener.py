@@ -1,6 +1,6 @@
-# Generated from ANTLRv4Parser.g4 by ANTLR 4.9.2
+# Generated from ANTLRv4Parser.g4 by ANTLR 4.13.1
 from antlr4 import *
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .ANTLRv4Parser import ANTLRv4Parser
 else:
     from ANTLRv4Parser import ANTLRv4Parser

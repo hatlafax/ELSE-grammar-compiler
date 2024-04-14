@@ -23,7 +23,7 @@ class ElseLanguage:
             self.output.write(f'    /VALID_IDENTIFIER_CHARACTERS="{self.valid_identifier}"\n')
             self.output.write(f'    /INDENT_SIZE={self.indentation}\n')
             self.output.write(f'    /VERSION={self.version}\n')
-            self.output.write( 'END DEFINE\n\n')
+            self.output.write( 'END DEFINE\n\n\n')
 
 
 class ElsePlaceholder:
@@ -128,6 +128,6 @@ class ElsePlaceholder:
             else:
                 self.output.write(f'    "{s}"\n')
         #self.output.write('\n')
-        self.output.write(     'END DEFINE\n\n')
+        self.output.write(     'END DEFINE\n\n\n')
 
         self.initialize()

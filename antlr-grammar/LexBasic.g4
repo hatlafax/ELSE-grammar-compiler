@@ -126,6 +126,7 @@ fragment NameChar
    : NameStartChar
    | '0' .. '9'
    | Underscore
+   | Dash
    | '\u00B7'
    | '\u0300' .. '\u036F'
    | '\u203F' .. '\u2040'
@@ -234,6 +235,10 @@ fragment PlusAssign
 
 fragment Underscore
    : '_'
+   ;
+
+fragment Dash
+   : '-'
    ;
 
 fragment Pipe

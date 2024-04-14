@@ -11,7 +11,7 @@ class ProcessListener(ProcessListenerBase):
     """Process the AST.
     """
 
-    patternRuleSpec = re.compile(r'^\s*(?:public|private|protected|fragment)?([A-Za-z0-9_]+)\s*:.*$')
+    patternRuleSpec = re.compile(r'^\s*(?:public|private|protected|fragment)?([A-Za-z0-9_-]+)\s*:.*$')
     patternSeparator = re.compile(r'^([,;|:]\s*).*$')
     patternMenuPlaceHolder = re.compile(r'^(:?\{.*\}|\[.*\])$')
 
@@ -127,7 +127,7 @@ class ProcessListener(ProcessListenerBase):
     # ELSE placeholder generation
     #
 
-    def createElseTerminalPlaceholder(self, placeholder_name) -> None:
+    def createElseTerminalPlaceholder(self, placeholder_name, content = None) -> None:
         if placeholder_name not in self._set_placeholders:
             self._set_placeholders.add(placeholder_name)
             self._options.placeholders.append(placeholder_name)
@@ -141,7 +141,13 @@ class ProcessListener(ProcessListenerBase):
             placeholder: ElsePlaceholder = ElsePlaceholder(self._output, self._language)
             placeholder.set_placeholder_name(placeholder_name)
             placeholder.set_placeholder_type(ElsePlaceholder.PlaceHolderType.TERMINAL)
-            placeholder.set_content(f"Enter a valid {placeholder_name} terminal.")
+
+            if content is not None and content.startswith("<<<") and content.endswith(">>>"):
+              content = content.strip('<>')
+              placeholder.set_content(content)
+            else:
+              placeholder.set_content(f"Enter a valid {placeholder_name} terminal.")
+
             placeholder.set_separator(separator)
             placeholder.write()
 
@@ -475,7 +481,9 @@ class ProcessListener(ProcessListenerBase):
             print(f"placeholder_name: {placeholder_name}")
 
         for placeholder_name, content in self._dict_placeholders.items():
-            if content is None:
+            if content is not None and isinstance(content, str) and content.startswith("<<<") and content.endswith(">>>"):
+                self.createElseTerminalPlaceholder(placeholder_name, content)
+            elif content is None:
                 self.createElseTerminalPlaceholder(placeholder_name)
             elif isinstance(content, str):
                 self.createElseNonTerminalPlaceholder(placeholder_name, content)

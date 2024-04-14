@@ -6,7 +6,7 @@ class PreProcessListener(ANTLRv4ParserListener):
     """Listen to terminals. Find start rule.
     """
 
-    patternRuleSpec = re.compile(r'^\s*(?:public|private|protected|fragment)?([A-Za-z0-9_]+)\s*:.*$')
+    patternRuleSpec = re.compile(r'^\s*(?:public|private|protected|fragment)?([A-Za-z0-9_-]+)\s*:.*$')
     patternQuotedTerminals = re.compile(r"^\s*'(?:[^']|\\')+'s*$")
 
     def __init__(self, options) -> None:
