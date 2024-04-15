@@ -6,7 +6,7 @@ class PreProcessListener(ANTLRv4ParserListener):
     """Listen to terminals. Find start rule.
     """
 
-    patternRuleSpec = re.compile(r'^\s*(?:public|private|protected|fragment)?([A-Za-z0-9_-]+)\s*:.*$')
+    patternRuleSpec = re.compile(r'^\s*(?:public|private|protected|fragment)?([A-Za-z0-9_-]+)(?:(?:annotations\(|locals\[|throws|returns)\s*[^:]+)?\s*:.*$')
     patternQuotedTerminals = re.compile(r"^\s*'(?:[^']|\\')+'s*$")
 
     def __init__(self, options) -> None:
@@ -95,7 +95,7 @@ class PreProcessListener(ANTLRv4ParserListener):
 
     def startRule(self) -> str:
         start_rule = None
-        heuristic = ['program', 'translationunit', 'translation_unit', 'compilation_unit', 'compilationunit']
+        heuristic = ['program', 'translationunit', 'translation_unit', 'compilation_unit', 'translation-unit', 'compilation-unit', 'compilationunit']
         for r, c in self._dictParserRules.items():
             if c == 0 and r.lower() in heuristic:
                 start_rule = r

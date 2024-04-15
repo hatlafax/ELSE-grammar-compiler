@@ -93,7 +93,7 @@ def main():
     parser.add_option('-c',
                       '--copyright-holder',
                       dest = 'copyright_holder',
-                      default = "2021 Johannes Brunen",
+                      default = "2024 Johannes Brunen",
                       metavar = 'HOLDER',
                       help = """Set the ELSE file copyright holder."""
                              """Defaults to '2021 Johannes Brunen'.""")
@@ -188,7 +188,13 @@ EbnfSuffix,
 Atom,
 Block,
 AltList,
+RuleSpec,
 Ruleref,
+AnnotationsSpec,
+AnnotationBlockSeq,
+AnnotationBlock,
+AnnotationKey,
+AnnotationValue,
 Terminal,
 Identifier"""
 
@@ -288,7 +294,7 @@ Identifier"""
 
         std_files = [
             [os.path.join(options.input_dir, "cmake.g4")],
-            [os.path.join(options.input_dir, "CPP14.g4")],
+            [os.path.join(options.input_dir, "CPP23.g4")],
             [os.path.join(options.input_dir, "C.g4")],
             [os.path.join(options.input_dir, "CSharpParser.g4"), os.path.join(options.input_dir, "CSharpPreprocessorParser.g4"), os.path.join(options.input_dir, "CSharpLexer.g4")],
             [os.path.join(options.input_dir, "Java9Parser.g4"), os.path.join(options.input_dir, "Java9Lexer.g4")],

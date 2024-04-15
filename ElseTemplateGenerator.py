@@ -95,7 +95,6 @@ class ElsePlaceholder:
         if self.placeholder_name is None:
             return
 
-        #name = self.placeholder_name.upper()
         name = self.placeholder_name
 
         m = ElsePlaceholder.patternPlaceholder.match(self.placeholder_name)
@@ -117,7 +116,6 @@ class ElsePlaceholder:
         self.output.write(    f'    /SEPARATOR="{self.separator}"\n')
         self.output.write(    f'    /TYPE={self.placeholder_type.name}\n')
 
-        #self.output.write('\n')
         for s in self.content.split('\n'):
             if self.placeholder_type is ElsePlaceholder.PlaceHolderType.MENU:
                 menu_attributes = ""
@@ -127,7 +125,7 @@ class ElsePlaceholder:
                 self.output.write(f'    "{s}"{menu_attributes}\n')
             else:
                 self.output.write(f'    "{s}"\n')
-        #self.output.write('\n')
+
         self.output.write(     'END DEFINE\n\n\n')
 
         self.initialize()

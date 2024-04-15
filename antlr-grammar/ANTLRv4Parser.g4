@@ -141,7 +141,7 @@ ruleSpec
    ;
 
 parserRuleSpec
-   : ruleModifiers? RULE_REF argActionBlock? ruleReturns? throwsSpec? localsSpec? rulePrequel* COLON ruleBlock SEMI exceptionGroup
+   : ruleModifiers? RULE_REF argActionBlock? ruleReturns? throwsSpec? localsSpec? annotationsSpec? rulePrequel* COLON ruleBlock SEMI exceptionGroup
    ;
 
 exceptionGroup
@@ -174,6 +174,34 @@ throwsSpec
 localsSpec
    : LOCALS argActionBlock
    ;
+
+annotationsSpec
+   : ANNOTATIONS LPAREN annotationBlockSeq RPAREN
+   ;
+
+annotationBlockSeq
+   : annotationBlock
+   | annotationBlock COMMA annotationBlockSeq
+   ;
+
+annotationBlock
+   : annotationKey ASSIGN annotationValue
+   ;
+
+annotationKey
+   : identifier
+   ;
+
+annotationValue
+   : STRING_LITERAL
+   ;
+
+//annotationValue
+//   : ANNOTATION_VALUE
+//   ;
+//annotationValue
+//   : identifier
+//   ;
 
 /** Match stuff like @init {int i;} */
 ruleAction

@@ -388,6 +388,66 @@ class ProcessListenerBase(ANTLRv4ParserListener):
             print (self.spaces() + "exitLocalsSpec: " + ctx.getText())
             self.unindent()
 
+    # Enter a parse tree produced by ANTLRv4Parser#annotationsSpec.
+    def enterAnnotationsSpec(self, ctx:ANTLRv4Parser.AnnotationsSpecContext):
+        if "enterAnnotationsSpec" in self.printTokens or "ALL" in self.printTokens:
+            self.indent()
+            print (self.spaces() + "enterAnnotationsSpec: " + ctx.getText())
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationsSpec.
+    def exitAnnotationsSpec(self, ctx:ANTLRv4Parser.AnnotationsSpecContext):
+        if "exitAnnotationsSpec" in self.printTokens or "ALL" in self.printTokens:
+            print (self.spaces() + "exitAnnotationsSpec: " + ctx.getText())
+            self.unindent()
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationBlockSeq.
+    def enterAnnotationBlockSeq(self, ctx:ANTLRv4Parser.AnnotationBlockSeqContext):
+        if "enterAnnotationBlockSeq" in self.printTokens or "ALL" in self.printTokens:
+            self.indent()
+            print (self.spaces() + "enterAnnotationBlockSeq: " + ctx.getText())
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationBlockSeq.
+    def exitAnnotationBlockSeq(self, ctx:ANTLRv4Parser.AnnotationBlockSeqContext):
+        if "exitAnnotationBlockSeq" in self.printTokens or "ALL" in self.printTokens:
+            print (self.spaces() + "exitAnnotationBlockSeq: " + ctx.getText())
+            self.unindent()
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationBlock.
+    def enterAnnotationBlock(self, ctx:ANTLRv4Parser.AnnotationBlockContext):
+        if "enterAnnotationBlock" in self.printTokens or "ALL" in self.printTokens:
+            self.indent()
+            print (self.spaces() + "enterAnnotationBlock: " + ctx.getText())
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationBlock.
+    def exitAnnotationBlock(self, ctx:ANTLRv4Parser.AnnotationBlockContext):
+        if "exitAnnotationBlock" in self.printTokens or "ALL" in self.printTokens:
+            print (self.spaces() + "exitAnnotationBlock: " + ctx.getText())
+            self.unindent()
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationKey.
+    def enterAnnotationKey(self, ctx:ANTLRv4Parser.AnnotationKeyContext):
+        if "enterAnnotationKey" in self.printTokens or "ALL" in self.printTokens:
+            self.indent()
+            print (self.spaces() + "enterAnnotationKey: " + ctx.getText())
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationKey.
+    def exitAnnotationKey(self, ctx:ANTLRv4Parser.AnnotationKeyContext):
+        if "exitAnnotationKey" in self.printTokens or "ALL" in self.printTokens:
+            print (self.spaces() + "exitAnnotationKey: " + ctx.getText())
+            self.unindent()
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationValue.
+    def enterAnnotationValue(self, ctx:ANTLRv4Parser.AnnotationValueContext):
+        if "enterAnnotationValue" in self.printTokens or "ALL" in self.printTokens:
+            self.indent()
+            print (self.spaces() + "enterAnnotationValue: " + ctx.getText())
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationValue.
+    def exitAnnotationValue(self, ctx:ANTLRv4Parser.AnnotationValueContext):
+        if "exitAnnotationValue" in self.printTokens or "ALL" in self.printTokens:
+            print (self.spaces() + "exitAnnotationValue: " + ctx.getText())
+            self.unindent()
+
     # Enter a parse tree produced by ANTLRv4Parser#ruleAction.
     def enterRuleAction(self, ctx:ANTLRv4Parser.RuleActionContext):
         if "enterRuleAction" in self.printTokens or "ALL" in self.printTokens:

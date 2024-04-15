@@ -39,6 +39,7 @@ python Antlr4ToElseCompiler.py -h
   #+begin_example
 python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l Python -p '*(),;:' -I 'a-zA-Z_0-9-' Python3Parser.g4 Python3Lexer.g4
 python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l Python -p '*(),;:' -I 'a-zA-Z_0-9-' -v Python3Parser.g4 Python3Lexer.g4
+python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l c++ -p '*(){}[].,;:' -I 'a-zA-Z_0-9-' CPP23.g4
   #+end_example
 
   The compiler also allows batch processing of grammar files. This works for the grammar files provided
@@ -77,7 +78,7 @@ python Antlr4ToElseCompiler.py -i ./grammars -o ./out -b
   At last a complete command line used for the generation of a Python language LSE template file.
 
   #+begin_example
-python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l Python -p '*(),;' -I 'a-zA-Z_0-9-' -w -r -x -v Python3Parser.g4 Python3Lexer.g4
+python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l python -p '*(),;' -I 'a-zA-Z_0-9-' -w -r -x -v Python3Parser.g4 Python3Lexer.g4
   #+end_example
 
   with the following files involved:
@@ -90,6 +91,25 @@ python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l Python -p '*(),;' -I 'a
   | =Python.lst=       | The generated placeholder list.                   |             | =./out=    | =-w=   |
   | =Python.map=       | The considered placeholder mapping file.          | =./grammar= |            | =-r=   |
   | =Python.spc=       | The considered no space separator pattern file.   | =./grammar= |            | =-x=   |
+
+  #+begin_example
+python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l c++ -p '*(){}[].,;:' -I 'a-zA-Z_0-9-' CPP23.g4
+  #+end_example
+
+* Antrlv4 grammar extensions
+
+  The parser allows additional annotations for ELSE in the rule specification by the optional =annotationsSpec= rule.
+
+  Examples: from the c++ grammar
+  
+  #+begin_example
+attribute-specifier
+  annotations (separator = ', ', substitute_count='10', description='Some text', dublication='vertical', auto_substitute='yes')
+  : '[[' attribute-using-prefix ? attribute-list ']]'
+  | alignment-specifier 
+  ;
+  #+end_example
+
 
 * Dependencies
 - [[https://www.antlr.org/][ANTLR v4]] >= 4.9.2

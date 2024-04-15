@@ -1727,6 +1727,7 @@ linkage-specification
   ;
 
 attribute-specifier
+  annotations (separator = ', ', substitute_count='10', description='Some text', dublication='vertical', auto_substitute='yes')
   : '[[' attribute-using-prefix ? attribute-list ']]'
   | alignment-specifier 
   ;

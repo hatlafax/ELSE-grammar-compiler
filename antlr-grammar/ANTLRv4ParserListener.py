@@ -251,6 +251,51 @@ class ANTLRv4ParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ANTLRv4Parser#annotationsSpec.
+    def enterAnnotationsSpec(self, ctx:ANTLRv4Parser.AnnotationsSpecContext):
+        pass
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationsSpec.
+    def exitAnnotationsSpec(self, ctx:ANTLRv4Parser.AnnotationsSpecContext):
+        pass
+
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationBlockSeq.
+    def enterAnnotationBlockSeq(self, ctx:ANTLRv4Parser.AnnotationBlockSeqContext):
+        pass
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationBlockSeq.
+    def exitAnnotationBlockSeq(self, ctx:ANTLRv4Parser.AnnotationBlockSeqContext):
+        pass
+
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationBlock.
+    def enterAnnotationBlock(self, ctx:ANTLRv4Parser.AnnotationBlockContext):
+        pass
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationBlock.
+    def exitAnnotationBlock(self, ctx:ANTLRv4Parser.AnnotationBlockContext):
+        pass
+
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationKey.
+    def enterAnnotationKey(self, ctx:ANTLRv4Parser.AnnotationKeyContext):
+        pass
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationKey.
+    def exitAnnotationKey(self, ctx:ANTLRv4Parser.AnnotationKeyContext):
+        pass
+
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationValue.
+    def enterAnnotationValue(self, ctx:ANTLRv4Parser.AnnotationValueContext):
+        pass
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationValue.
+    def exitAnnotationValue(self, ctx:ANTLRv4Parser.AnnotationValueContext):
+        pass
+
+
     # Enter a parse tree produced by ANTLRv4Parser#ruleAction.
     def enterRuleAction(self, ctx:ANTLRv4Parser.RuleActionContext):
         pass

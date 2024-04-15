@@ -11,7 +11,8 @@ class ProcessListener(ProcessListenerBase):
     """Process the AST.
     """
 
-    patternRuleSpec = re.compile(r'^\s*(?:public|private|protected|fragment)?([A-Za-z0-9_-]+)\s*:.*$')
+    #patternRuleSpec = re.compile(r'^\s*(?:public|private|protected|fragment)?([A-Za-z0-9_-]+)\s*:.*$')
+    patternRuleSpec = re.compile(r'^\s*(?:public|private|protected|fragment)?([A-Za-z0-9_-]+)(?:(?:annotations\(|locals\[|throws|returns)\s*[^:]+)?\s*:.*$')
     patternSeparator = re.compile(r'^([,;|:]\s*).*$')
     patternMenuPlaceHolder = re.compile(r'^(:?\{.*\}|\[.*\])$')
 
@@ -26,6 +27,7 @@ class ProcessListener(ProcessListenerBase):
         self._isParserRuleSpec = False
 
         self._parserRule = None
+        self._annotationKey = None
 
         self._stack_placeholders: Stack[str] = Stack()
         self._stack_alternatives: Stack[List[str]] = Stack()
@@ -34,7 +36,12 @@ class ProcessListener(ProcessListenerBase):
         self._set_placeholders: Set[str] = set()
         self._dict_placeholders = dict()
 
-        self._dict_placeholders_separators: dict[str, str] = dict()
+        self._dict_placeholders_substitute_type  : dict[str, str] = dict()
+        self._dict_placeholders_substitute_count : dict[str, str] = dict()
+        self._dict_placeholders_description      : dict[str, str] = dict()
+        self._dict_placeholders_duplication_type : dict[str, str] = dict()
+        self._dict_placeholders_separators       : dict[str, str] = dict()
+
     #
     # Helper functions
     #
@@ -132,7 +139,11 @@ class ProcessListener(ProcessListenerBase):
             self._set_placeholders.add(placeholder_name)
             self._options.placeholders.append(placeholder_name)
 
-            separator = self._dict_placeholders_separators.get(placeholder_name, "")
+            separator        = self._dict_placeholders_separators.get(placeholder_name,       "")
+            substitute_count = self._dict_placeholders_substitute_count.get(placeholder_name, 1)
+            description      = self._dict_placeholders_description.get(placeholder_name,      "")
+            duplication_type = self._dict_placeholders_duplication_type.get(placeholder_name, ElsePlaceholder.DuplicationType.CONTEXT_DEPENDENT)
+            substitute_type  = self._dict_placeholders_substitute_type.get(placeholder_name,  ElsePlaceholder.SubstituteType.NOAUTO_SUBSTITUTE)
 
             if self._options.read_placeholders:
                 if placeholder_name in self._options.placeholders_map:
@@ -148,7 +159,12 @@ class ProcessListener(ProcessListenerBase):
             else:
               placeholder.set_content(f"Enter a valid {placeholder_name} terminal.")
 
-            placeholder.set_separator(separator)
+            placeholder.set_separator       (separator)
+            placeholder.set_substitute_type (substitute_type)
+            placeholder.set_substitute_count(substitute_count)
+            placeholder.set_description     (description)
+            placeholder.set_duplication_type(duplication_type)
+
             placeholder.write()
 
             self.log(f"createElseTerminalPlaceholder -> {placeholder_name}", indentation = 2)
@@ -158,7 +174,11 @@ class ProcessListener(ProcessListenerBase):
             self._set_placeholders.add(placeholder_name)
             self._options.placeholders.append(placeholder_name)
 
-            separator = self._dict_placeholders_separators.get(placeholder_name, "")
+            separator        = self._dict_placeholders_separators.get(placeholder_name,       "")
+            substitute_count = self._dict_placeholders_substitute_count.get(placeholder_name, 1)
+            description      = self._dict_placeholders_description.get(placeholder_name,      "")
+            duplication_type = self._dict_placeholders_duplication_type.get(placeholder_name, ElsePlaceholder.DuplicationType.CONTEXT_DEPENDENT)
+            substitute_type  = self._dict_placeholders_substitute_type.get(placeholder_name,  ElsePlaceholder.SubstituteType.NOAUTO_SUBSTITUTE)
 
             indentation = self._options.indentation * " "
 
@@ -181,13 +201,19 @@ class ProcessListener(ProcessListenerBase):
             placeholder.set_placeholder_type(ElsePlaceholder.PlaceHolderType.NONTERMINAL)
             placeholder.set_content(content)
 
-            m = ProcessListener.patternSeparator.match(content)
-            if m and len(separator) == 0:
-                separator = m.group(1)
-                if len(separator) == 1:
-                    separator += " "
+            if len(separator) == 0:
+                m = ProcessListener.patternSeparator.match(content)
+                if m and len(separator) == 0:
+                    separator = m.group(1)
+                    if len(separator) == 1:
+                        separator += " "
 
-            placeholder.set_separator(separator)
+            placeholder.set_separator       (separator)
+            placeholder.set_substitute_type (substitute_type)
+            placeholder.set_substitute_count(substitute_count)
+            placeholder.set_description     (description)
+            placeholder.set_duplication_type(duplication_type)
+
             placeholder.write()
 
             self.log(f"createElseNonTerminalPlaceholder -> {placeholder_name} -> {content}", indentation = 2)
@@ -197,7 +223,11 @@ class ProcessListener(ProcessListenerBase):
             self._set_placeholders.add(placeholder_name)
             self._options.placeholders.append(placeholder_name)
 
-            separator = self._dict_placeholders_separators.get(placeholder_name, "")
+            separator        = self._dict_placeholders_separators.get(placeholder_name,       "")
+            substitute_count = self._dict_placeholders_substitute_count.get(placeholder_name, 1)
+            description      = self._dict_placeholders_description.get(placeholder_name,      "")
+            duplication_type = self._dict_placeholders_duplication_type.get(placeholder_name, ElsePlaceholder.DuplicationType.CONTEXT_DEPENDENT)
+            substitute_type  = self._dict_placeholders_substitute_type.get(placeholder_name,  ElsePlaceholder.SubstituteType.NOAUTO_SUBSTITUTE)
 
             if self._options.read_placeholders:
                 if placeholder_name in self._options.placeholders_map:
@@ -221,8 +251,13 @@ class ProcessListener(ProcessListenerBase):
                 else:
                     content += "\n" + alternative
 
-            placeholder.set_content(content)
-            placeholder.set_separator(separator)
+            placeholder.set_content         (content)
+            placeholder.set_separator       (separator)
+            placeholder.set_substitute_type (substitute_type)
+            placeholder.set_substitute_count(substitute_count)
+            placeholder.set_description     (description)
+            placeholder.set_duplication_type(duplication_type)
+
             placeholder.write()
 
             self.log(f"createElseMenuPlaceholder -> {placeholder_name} ->", indentation = 2)
@@ -248,6 +283,80 @@ class ProcessListener(ProcessListenerBase):
             self._parserRule = None
             self._isParserRuleSpec = False
 
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationsSpec.
+    def enterAnnotationsSpec(self, ctx:ANTLRv4Parser.AnnotationsSpecContext):
+        super().enterAnnotationsSpec(ctx)
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationsSpec.
+    def exitAnnotationsSpec(self, ctx:ANTLRv4Parser.AnnotationsSpecContext):
+        super().exitAnnotationsSpec(ctx)
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationBlockSeq.
+    def enterAnnotationBlockSeq(self, ctx:ANTLRv4Parser.AnnotationBlockSeqContext):
+        super().enterAnnotationBlockSeq(ctx)
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationBlockSeq.
+    def exitAnnotationBlockSeq(self, ctx:ANTLRv4Parser.AnnotationBlockSeqContext):
+        super().exitAnnotationBlockSeq(ctx)
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationBlock.
+    def enterAnnotationBlock(self, ctx:ANTLRv4Parser.AnnotationBlockContext):
+        super().enterAnnotationBlock(ctx)
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationBlock.
+    def exitAnnotationBlock(self, ctx:ANTLRv4Parser.AnnotationBlockContext):
+        super().exitAnnotationBlock(ctx)
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationKey.
+    def enterAnnotationKey(self, ctx:ANTLRv4Parser.AnnotationKeyContext):
+        super().enterAnnotationKey(ctx)
+        self._annotationKey = ctx.getText()
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationKey.
+    def exitAnnotationKey(self, ctx:ANTLRv4Parser.AnnotationKeyContext):
+        super().exitAnnotationKey(ctx)
+
+    # Enter a parse tree produced by ANTLRv4Parser#annotationValue.
+    def enterAnnotationValue(self, ctx:ANTLRv4Parser.AnnotationValueContext):
+        super().enterAnnotationValue(ctx)
+
+        if   self._annotationKey.lower() == 'separator':
+            separator = ctx.getText()[1:-1]
+            self._dict_placeholders_separators[self._parserRule] = separator
+
+        elif self._annotationKey.lower() == 'substitute-count' or self._annotationKey.lower() == 'substitute_count':
+            substitute_count = int(ctx.getText()[1:-1])
+            self._dict_placeholders_substitute_count[self._parserRule] = substitute_count
+
+        elif self._annotationKey.lower() == 'description':
+            description = ctx.getText()[1:-1]
+            self._dict_placeholders_description[self._parserRule] = description
+
+        elif self._annotationKey.lower() == 'duplication':
+            duplication_type = ctx.getText()[1:-1].lower()
+            if   duplication_type == 'context_dependent':
+                duplication_type = ElsePlaceholder.DuplicationType.CONTEXT_DEPENDENT
+            elif duplication_type == 'vertical':
+                duplication_type = ElsePlaceholder.DuplicationType.VERTICAL
+            elif duplication_type == 'horizontal':
+                duplication_type = ElsePlaceholder.DuplicationType.HORIZONTAL
+            else:
+                duplication_type = ElsePlaceholder.DuplicationType.CONTEXT_DEPENDENT
+            self._dict_placeholders_duplication_type[self._parserRule] = duplication_type
+
+        elif self._annotationKey.lower() == 'substitute-type' or self._annotationKey.lower() == 'substitute_type':
+            substitute_type = ctx.getText()[1:-1].lower()
+            if substitute_type == '1' or auto_substitute == 'yes' or auto_substitute == 'true' or auto_substitute == 'on':
+                substitute_type = ElsePlaceholder.SubstituteType.AUTO_SUBSTITUTE
+            else:
+                substitute_type = ElsePlaceholder.SubstituteType.NOAUTO_SUBSTITUTE
+            self._dict_placeholders_substitute_type[self._parserRule] = substitute_type
+
+    # Exit a parse tree produced by ANTLRv4Parser#annotationValue.
+    def exitAnnotationValue(self, ctx:ANTLRv4Parser.AnnotationValueContext):
+        super().exitAnnotationValue(ctx)
+        self._annotationKey = None
 
     # Enter a parse tree produced by ANTLRv4Parser#ruleBlock.
     def enterRuleBlock(self, ctx:ANTLRv4Parser.RuleBlockContext):
