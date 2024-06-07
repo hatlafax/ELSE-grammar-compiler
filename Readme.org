@@ -75,7 +75,7 @@ python Antlr4ToElseCompiler.py -i ./grammars -o ./out -b
   grammar. This option is useful in case that you are dealing with a reduced grammar file without any lexer
   information.
 
-  At last a complete command line used for the generation of a Python language LSE template file.
+  At last a complete command line used for the generation of a Python language LSE template file...
 
   #+begin_example
 python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l python -p '*(),;' -I 'a-zA-Z_0-9-' -w -r -x -v Python3Parser.g4 Python3Lexer.g4
@@ -91,6 +91,8 @@ python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l python -p '*(),;' -I 'a
   | =Python.lst=       | The generated placeholder list.                   |             | =./out=    | =-w=   |
   | =Python.map=       | The considered placeholder mapping file.          | =./grammar= |            | =-r=   |
   | =Python.spc=       | The considered no space separator pattern file.   | =./grammar= |            | =-x=   |
+
+... and a complete command line used for the generation of a C++ language LSE template file.
 
   #+begin_example
 python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l c++ -p '*(){}[].,;:' -I 'a-zA-Z_0-9-' CPP23.g4
