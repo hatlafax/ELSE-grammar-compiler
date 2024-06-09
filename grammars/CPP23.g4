@@ -1,7 +1,7 @@
 grammar CPP23;
 
 //
-// n4971 working draft
+// n4981 working draft
 //
 
 
@@ -13,32 +13,6 @@ grammar CPP23;
 //
 // A.2 Keywords
 //
-typedef-name
-  : identifier
-  | simple-template-id
-  ;
-
-namespace-name
-  : identifier
-  | namespace-alias
-  ;
-
-namespace-alias
-  : identifier
-  ;
-
-class-name
-  : identifier
-  | simple-template-id
-  ;
-
-enum-name
-  : identifier
-  ;
-
-template-name
-  : identifier
-  ;
 
 
 //
@@ -1207,7 +1181,7 @@ iteration-statement
 
 for-range-declaration
   : attribute-specifier* decl-specifier-seq declarator
-  | attribute-specifier* decl-specifier-seq ref-qualifier ? '[' identifier+ ']' 
+  | structured-binding-declaration
   ;
 
 for-range-initializer
@@ -1243,6 +1217,7 @@ name-declaration
   : block-declaration
   | nodeclspec-function-declaration
   | function-definition
+  | friend-type-declaration
   | template-declaration
   | deduction-guide
   | linkage-specification
@@ -1278,10 +1253,28 @@ alias-declaration
   : 'using' identifier attribute-specifier* '=' defining-type-id ';' 
   ;
 
+attributed-identifier
+  : identifier attribute-specifier*
+  ;
+
+attributed-identifier-list
+  : attributed-identifier
+  | attributed-identifier-list ',' attributed-identifier
+  ;
+
+structured-binding-declaration
+  : attribute-specifier* decl-specifier-seq ref-qualifier? '[' attributed-identifier-list ']'
+  ;
+
 simple-declaration
-  : decl-specifier-seq init-declarator-list ? ';'
+  : decl-specifier-seq init-declarator-list? ';'
   | attribute-specifier* decl-specifier-seq init-declarator-list ';'
-  | attribute-specifier* decl-specifier-seq ref-qualifier ? '[' identifier+ ']' initializer ';' 
+  | structured-binding-declaration initializer ';' 
+  ;
+
+static-assert-message
+  : unevaluated-string
+  | constant-expression
   ;
 
 static-assert-declaration
@@ -1587,7 +1580,12 @@ function-body
   : ctor-initializer ? compound-statement
   | function-try-block
   | '= default;'
-  | '= delete;' 
+  | deleted-function-body
+  ;
+
+deleted-function-body
+  : '= delete;' 
+  | '= delete(' unevaluated-string ');' 
   ;
 
 enum-name
@@ -1672,12 +1670,12 @@ unnamed-namespace-definition
   ;
 
 nested-namespace-definition
-  : 'namespace' enclosing-namespace-specifier nested-inline ? identifier '{' namespace-body '}' 
+  : 'namespace' enclosing-namespace-specifier '::' inline ? identifier '{' namespace-body '}' 
   ;
 
 enclosing-namespace-specifier
   : identifier
-  | enclosing-namespace-specifier nested-inline ? identifier 
+  | enclosing-namespace-specifier '::' inline ? identifier 
   ;
 
 namespace-body
@@ -1866,6 +1864,7 @@ member-specification
 member-declaration
   : attribute-specifier* decl-specifier-seq ? member-declarator-list ? ';'
   | function-definition
+  | friend-type-declaration
   | using-declaration
   | using-enum-declaration
   | static-assert-declaration
@@ -1901,6 +1900,21 @@ virt-specifier
 
 pure-specifier
   : '= 0' 
+  ;
+
+friend-type-declaration
+  : 'friend' friend-type-specifier-list ';'
+  ;
+
+friend-type-specifier-list
+  : friend-type-specifier three-dots ?
+  | friend-type-specifier-list ',' friend-type-specifier three-dots ?
+  ;
+
+friend-type-specifier
+  : simple-type-specifier
+  | elaborated-type-specifier
+  | typename-specifier
   ;
 
 conversion-function-id
@@ -2271,6 +2285,10 @@ new-line
 defined-macro-expression
   : 'defined' identifier
   | 'defined(' identifier ')' 
+  ;
+
+h-preprocessing-token
+  : '<<<Enter any preprocessing-token other than >.>>>' 
   ;
 
 header-name-tokens
