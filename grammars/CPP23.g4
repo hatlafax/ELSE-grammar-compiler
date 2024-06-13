@@ -7,8 +7,6 @@ grammar CPP23;
 
 //
 // A.1 General
-//
-
 
 //
 // A.2 Keywords
@@ -126,8 +124,8 @@ identifier-continue
   ;
 
 nondigit
-  :'a'
-  |'b'
+  : 'a'
+  | 'b'
   | 'c'
   | 'd'
   | 'e'
@@ -282,17 +280,17 @@ keyword
   ;
 
 preprocessing-op-or-punc
-  : 
+  :
   preprocessing-operator
-  | 
-  operator-or-punctuator 
+  |
+  operator-or-punctuator
   ;
 
 preprocessing-operator
   : '#'
   | '##'
   | '%:'
-  | '%:%:' 
+  | '%:%:'
   ;
 
 operator-or-punctuator
@@ -360,7 +358,7 @@ operator-or-punctuator
   | 'and_eq'
   | 'or_eq'
   | 'xor_eq'
-  | 'not_eq' 
+  | 'not_eq'
   ;
 
 literal
@@ -1064,33 +1062,33 @@ inclusive-or-expression
 
 logical-and-expression
   : inclusive-or-expression
-  | logical-and-expression '&&' inclusive-or-expression 
+  | logical-and-expression '&&' inclusive-or-expression
   ;
 
 logical-or-expression
   : logical-and-expression
-  | logical-or-expression '||' logical-and-expression 
+  | logical-or-expression '||' logical-and-expression
   ;
 
 conditional-expression
   : logical-or-expression
-  | logical-or-expression '?' expression ':' assignment-expression 
+  | logical-or-expression '?' expression ':' assignment-expression
   ;
 
 yield-expression
   : 'co_yield' assignment-expression
-  | 'co_yield' braced-init-list 
+  | 'co_yield' braced-init-list
   ;
 
 throw-expression
-  : 'throw' assignment-expression ? 
+  : 'throw' assignment-expression ?
   ;
 
 assignment-expression
   : conditional-expression
   | yield-expression
   | throw-expression
-  | logical-or-expression assignment-operator initializer-clause 
+  | logical-or-expression assignment-operator initializer-clause
   ;
 
 assignment-operator
@@ -1104,16 +1102,16 @@ assignment-operator
   | '<<='
   | '&='
   | '^='
-  | '|=' 
+  | '|='
   ;
 
 expression
   : assignment-expression
-  | expression ',' assignment-expression 
+  | expression ',' assignment-expression
   ;
 
 constant-expression
-  : conditional-expression 
+  : conditional-expression
   ;
 
 statement
@@ -1124,7 +1122,7 @@ statement
   | attribute-specifier* iteration-statement
   | attribute-specifier* jump-statement
   | declaration-statement
-  | attribute-specifier* try-block 
+  | attribute-specifier* try-block
   ;
 
 init-statement
@@ -1135,7 +1133,7 @@ init-statement
 
 condition
   : expression
-  | attribute-specifier* decl-specifier-seq declarator brace-or-equal-initializer 
+  | attribute-specifier* decl-specifier-seq declarator brace-or-equal-initializer
   ;
 
 label
@@ -1149,11 +1147,11 @@ labeled-statement
   ;
 
 expression-statement
-  : expression ? ';' 
+  : expression ? ';'
   ;
 
 compound-statement
-  : '{' statement* label* '}' 
+  : '{' statement* label* '}'
   ;
 
 if-constexpr
@@ -1169,14 +1167,14 @@ selection-statement
   | if-constexpr ? '(' init-statement ? condition ')' statement 'else' statement
   | if-exlamation-mark ? 'consteval' compound-statement
   | if-exlamation-mark ? 'consteval' compound-statement 'else' statement
-  | 'switch(' init-statement ? condition ')' statement 
+  | 'switch(' init-statement ? condition ')' statement
   ;
 
 iteration-statement
   : 'while(' condition ')' statement
   | 'do' statement 'while(' expression ');'
   | 'for(' init-statement condition ? ';' expression ? ')' statement
-  | 'for(' init-statement ? for-range-declaration ':' for-range-initializer ')' statement 
+  | 'for(' init-statement ? for-range-declaration ':' for-range-initializer ')' statement
   ;
 
 for-range-declaration
@@ -1185,7 +1183,7 @@ for-range-declaration
   ;
 
 for-range-initializer
-  : expr-or-braced-init-list 
+  : expr-or-braced-init-list
   ;
 
 jump-statement
@@ -1224,7 +1222,7 @@ name-declaration
   | namespace-definition
   | empty-declaration
   | attribute-declaration
-  | module-import-declaration 
+  | module-import-declaration
   ;
 
 special-declaration
@@ -1242,15 +1240,15 @@ block-declaration
   | using-directive
   | static-assert-declaration
   | alias-declaration
-  | opaque-enum-declaration 
+  | opaque-enum-declaration
   ;
 
 nodeclspec-function-declaration
-  : attribute-specifier* declarator ';' 
+  : attribute-specifier* declarator ';'
   ;
 
 alias-declaration
-  : 'using' identifier attribute-specifier* '=' defining-type-id ';' 
+  : 'using' identifier attribute-specifier* '=' defining-type-id ';'
   ;
 
 attributed-identifier
@@ -1269,7 +1267,7 @@ structured-binding-declaration
 simple-declaration
   : decl-specifier-seq init-declarator-list? ';'
   | attribute-specifier* decl-specifier-seq init-declarator-list ';'
-  | structured-binding-declaration initializer ';' 
+  | structured-binding-declaration initializer ';'
   ;
 
 static-assert-message
@@ -1279,15 +1277,15 @@ static-assert-message
 
 static-assert-declaration
   : 'static-assert(' constant-expression ');'
-  | 'static-assert(' constant-expression ',' static-assert-message ');' 
+  | 'static-assert(' constant-expression ',' static-assert-message ');'
   ;
 
 empty-declaration
-  : ';' 
+  : ';'
   ;
 
 attribute-declaration
-  : attribute-specifier+ ';' 
+  : attribute-specifier+ ';'
   ;
 
 decl-specifier
@@ -1299,57 +1297,57 @@ decl-specifier
   | 'constexpr'
   | 'consteval'
   | 'constinit'
-  | 'inline' 
+  | 'inline'
   ;
 
 decl-specifier-seq
   : decl-specifier attribute-specifier*
-  | decl-specifier decl-specifier-seq 
+  | decl-specifier decl-specifier-seq
   ;
 
 storage-class-specifier
   : 'static'
   | 'thread_local'
   | 'extern'
-  | 'mutable' 
+  | 'mutable'
   ;
 
 function-specifier
   : 'virtual'
-  | explicit-specifier 
+  | explicit-specifier
   ;
 
 explicit-specifier
   : 'explicit(' constant-expression ')'
-  | 'explicit' 
+  | 'explicit'
   ;
 
 typedef-name
   : identifier
-  | simple-template-id 
+  | simple-template-id
   ;
 
 type-specifier
   : simple-type-specifier
   | elaborated-type-specifier
   | typename-specifier
-  | cv-qualifier 
+  | cv-qualifier
   ;
 
 type-specifier-seq
   : type-specifier attribute-specifier*
-  | type-specifier type-specifier-seq 
+  | type-specifier type-specifier-seq
   ;
 
 defining-type-specifier
   : type-specifier
   | class-specifier
-  | enum-specifier 
+  | enum-specifier
   ;
 
 defining-type-specifier-seq
   : defining-type-specifier attribute-specifier*
-  | defining-type-specifier defining-type-specifier-seq 
+  | defining-type-specifier defining-type-specifier-seq
   ;
 
 simple-type-specifier
@@ -1371,13 +1369,13 @@ simple-type-specifier
   | 'unsigned'
   | 'float'
   | 'double'
-  | 'void' 
+  | 'void'
   ;
 
 type-name
   : class-name
   | enum-name
-  | typedef-name 
+  | typedef-name
   ;
 
 computed-type-specifier
@@ -1397,47 +1395,47 @@ elaborated-type-specifier
   ;
 
 decltype-specifier
-  : 'decltype(' expression ')' 
+  : 'decltype(' expression ')'
   ;
 
 placeholder-type-specifier
   : type-constraint ? 'auto'
-  | type-constraint ? 'decltype(auto)' 
+  | type-constraint ? 'decltype(auto)'
   ;
 
 init-declarator-list
   : init-declarator
-  | init-declarator-list ',' init-declarator 
+  | init-declarator-list ',' init-declarator
   ;
 
 init-declarator
   : declarator initializer ?
-  | declarator requires-clause 
+  | declarator requires-clause
   ;
 
 declarator
   : ptr-declarator
-  | noptr-declarator parameters-and-qualifiers trailing-return-type 
+  | noptr-declarator parameters-and-qualifiers trailing-return-type
   ;
 
 ptr-declarator
   : noptr-declarator
-  | ptr-operator ptr-declarator 
+  | ptr-operator ptr-declarator
   ;
 
 noptr-declarator
   : declarator-id attribute-specifier*
   | noptr-declarator parameters-and-qualifiers
   | noptr-declarator '[' constant-expression ? ']' attribute-specifier*
-  | '(' ptr-declarator ')' 
+  | '(' ptr-declarator ')'
   ;
 
 parameters-and-qualifiers
-  : '(' parameter-declaration-clause ')' cv-qualifier* ref-qualifier ? noexcept-specifier ? attribute-specifier* 
+  : '(' parameter-declaration-clause ')' cv-qualifier* ref-qualifier ? noexcept-specifier ? attribute-specifier*
   ;
 
 trailing-return-type
-  : '->' type-id 
+  : '->' type-id
   ;
 
 ptr-operator
@@ -1446,17 +1444,17 @@ ptr-operator
   | '&&' attribute-specifier*
   | nested-name-specifier '*' attribute-specifier* cv-qualifier*
   | ms-based-modifier ? '*' attribute-specifier* ms-pointer-modifier* cv-qualifier*
-  | ms-based-modifier ? nested-name-specifier '*' attribute-specifier* ms-pointer-modifier* cv-qualifier* 
+  | ms-based-modifier ? nested-name-specifier '*' attribute-specifier* ms-pointer-modifier* cv-qualifier*
   ;
 
 cv-qualifier
   : 'const'
-  | 'volatile' 
+  | 'volatile'
   ;
 
 ref-qualifier
   : '&'
-  | '&&' 
+  | '&&'
   ;
 
 three-dots
@@ -1464,52 +1462,52 @@ three-dots
   ;
 
 declarator-id
-  : three-dots ? id-expression 
+  : three-dots ? id-expression
   ;
 
 type-id
-  : type-specifier-seq abstract-declarator ? 
+  : type-specifier-seq abstract-declarator ?
   ;
 
 defining-type-id
-  : defining-type-specifier-seq abstract-declarator ? 
+  : defining-type-specifier-seq abstract-declarator ?
   ;
 
 abstract-declarator
   : ptr-abstract-declarator
   | noptr-abstract-declarator ? parameters-and-qualifiers trailing-return-type
-  | abstract-pack-declarator 
+  | abstract-pack-declarator
   ;
 
 ptr-abstract-declarator
   : noptr-abstract-declarator
-  | ptr-operator ptr-abstract-declarator ? 
+  | ptr-operator ptr-abstract-declarator ?
   ;
 
 noptr-abstract-declarator
   : noptr-abstract-declarator ? parameters-and-qualifiers
   | noptr-abstract-declarator ? '[' constant-expression ? ']' attribute-specifier*
-  | '(' ptr-abstract-declarator ')' 
+  | '(' ptr-abstract-declarator ')'
   ;
 
 abstract-pack-declarator
   : noptr-abstract-pack-declarator
-  | ptr-operator abstract-pack-declarator 
+  | ptr-operator abstract-pack-declarator
   ;
 
 noptr-abstract-pack-declarator
   : noptr-abstract-pack-declarator parameters-and-qualifiers
-  | '...' 
+  | '...'
   ;
 
 parameter-declaration-clause
   : parameter-declaration-list ?  three-dots ?
-  | parameter-declaration-list ', ...' 
+  | parameter-declaration-list ', ...'
   ;
 
 parameter-declaration-list
   : parameter-declaration
-  | parameter-declaration-list ',' parameter-declaration 
+  | parameter-declaration-list ',' parameter-declaration
   ;
 
 this
@@ -1520,22 +1518,22 @@ parameter-declaration
   : attribute-specifier* this ? decl-specifier-seq declarator
   | attribute-specifier* decl-specifier-seq declarator '=' initializer-clause
   | attribute-specifier* this ? decl-specifier-seq abstract-declarator ?
-  | attribute-specifier* decl-specifier-seq abstract-declarator ? '=' initializer-clause 
+  | attribute-specifier* decl-specifier-seq abstract-declarator ? '=' initializer-clause
   ;
 
 initializer
   : brace-or-equal-initializer
-  | '(' expression-list ')' 
+  | '(' expression-list ')'
   ;
 
 brace-or-equal-initializer
   : '=' initializer-clause
-  | braced-init-list 
+  | braced-init-list
   ;
 
 initializer-clause
   : assignment-expression
-  | braced-init-list 
+  | braced-init-list
   ;
 
 comma
@@ -1545,35 +1543,35 @@ comma
 braced-init-list
   : '{' initializer-list comma ? '}'
   | '{' designated-initializer-list comma ? '}'
-  | '{}' 
+  | '{}'
   ;
 
 initializer-list
   : initializer-clause  three-dots ?
-  | initializer-list ',' initializer-clause  three-dots ? 
+  | initializer-list ',' initializer-clause  three-dots ?
   ;
 
 designated-initializer-list
   : designated-initializer-clause
-  | designated-initializer-list ',' designated-initializer-clause 
+  | designated-initializer-list ',' designated-initializer-clause
   ;
 
 designated-initializer-clause
-  : designator brace-or-equal-initializer 
+  : designator brace-or-equal-initializer
   ;
 
 designator
-  : '.' identifier 
+  : '.' identifier
   ;
 
 expr-or-braced-init-list
   : expression
-  | braced-init-list 
+  | braced-init-list
   ;
 
 function-definition
   : attribute-specifier* decl-specifier-seq ? declarator virt-specifier-seq ? function-body
-  | attribute-specifier* decl-specifier-seq ? declarator requires-clause function-body 
+  | attribute-specifier* decl-specifier-seq ? declarator requires-clause function-body
   ;
 
 function-body
@@ -1584,57 +1582,57 @@ function-body
   ;
 
 deleted-function-body
-  : '= delete;' 
-  | '= delete(' unevaluated-string ');' 
+  : '= delete;'
+  | '= delete(' unevaluated-string ');'
   ;
 
 enum-name
-  : identifier 
+  : identifier
   ;
 
 enum-specifier
   : enum-head '{' enumerator-list ? '}'
-  | enum-head '{' enumerator-list ', }' 
+  | enum-head '{' enumerator-list ', }'
   ;
 
 enum-head
-  : enum-key attribute-specifier* enum-head-name ? enum-base ? 
+  : enum-key attribute-specifier* enum-head-name ? enum-base ?
   ;
 
 enum-head-name
-  : nested-name-specifier ? identifier 
+  : nested-name-specifier ? identifier
   ;
 
 opaque-enum-declaration
-  : enum-key attribute-specifier* enum-head-name enum-base ? ';' 
+  : enum-key attribute-specifier* enum-head-name enum-base ? ';'
   ;
 
 enum-key
   : 'enum'
   | 'enum class'
-  | 'enum struct' 
+  | 'enum struct'
   ;
 
 enum-base
-  : ':' type-specifier-seq 
+  : ':' type-specifier-seq
   ;
 
 enumerator-list
   : enumerator-definition
-  | enumerator-list ',' enumerator-definition 
+  | enumerator-list ',' enumerator-definition
   ;
 
 enumerator-definition
   : enumerator
-  | enumerator '=' constant-expression 
+  | enumerator '=' constant-expression
   ;
 
 enumerator
-  : identifier attribute-specifier* 
+  : identifier attribute-specifier*
   ;
 
 using-enum-declaration
-  : 'using enum' using-enum-declarator ';' 
+  : 'using enum' using-enum-declarator ';'
   ;
 
 using-enum-declarator
@@ -1644,13 +1642,13 @@ using-enum-declarator
 
 namespace-name
   : identifier
-  | namespace-alias 
+  | namespace-alias
   ;
 
 namespace-definition
   : named-namespace-definition
   | unnamed-namespace-definition
-  | nested-namespace-definition 
+  | nested-namespace-definition
   ;
 
 inline
@@ -1662,20 +1660,20 @@ nested-inline
   ;
 
 named-namespace-definition
-  : inline ? 'namespace' attribute-specifier* identifier '{' namespace-body '}' 
+  : inline ? 'namespace' attribute-specifier* identifier '{' namespace-body '}'
   ;
 
 unnamed-namespace-definition
-  : inline ? 'namespace' attribute-specifier* '{' namespace-body '}' 
+  : inline ? 'namespace' attribute-specifier* '{' namespace-body '}'
   ;
 
 nested-namespace-definition
-  : 'namespace' enclosing-namespace-specifier '::' inline ? identifier '{' namespace-body '}' 
+  : 'namespace' enclosing-namespace-specifier '::' inline ? identifier '{' namespace-body '}'
   ;
 
 enclosing-namespace-specifier
   : identifier
-  | enclosing-namespace-specifier '::' inline ? identifier 
+  | enclosing-namespace-specifier '::' inline ? identifier
   ;
 
 namespace-body
@@ -1683,28 +1681,28 @@ namespace-body
   ;
 
 namespace-alias
-  : identifier 
+  : identifier
   ;
 
 namespace-alias-definition
-  : 'namespace' identifier '=' qualified-namespace-specifier ';' 
+  : 'namespace' identifier '=' qualified-namespace-specifier ';'
   ;
 
 qualified-namespace-specifier
-  : nested-name-specifier ? namespace-name 
+  : nested-name-specifier ? namespace-name
   ;
 
 using-directive
-  : attribute-specifier* 'using namespace' nested-name-specifier ? namespace-name ';' 
+  : attribute-specifier* 'using namespace' nested-name-specifier ? namespace-name ';'
   ;
 
 using-declaration
-  : 'using' using-declarator-list ';' 
+  : 'using' using-declarator-list ';'
   ;
 
 using-declarator-list
   : using-declarator three-dots ?
-  | using-declarator-list ',' using-declarator three-dots ? 
+  | using-declarator-list ',' using-declarator three-dots ?
   ;
 
 typename
@@ -1712,64 +1710,64 @@ typename
   ;
 
 using-declarator
-  : typename ? nested-name-specifier unqualified-id 
+  : typename ? nested-name-specifier unqualified-id
   ;
 
 asm-declaration
-  : attribute-specifier* 'asm(' balanced-token-seq ');' 
+  : attribute-specifier* 'asm(' balanced-token-seq ');'
   ;
 
 linkage-specification
   : 'extern' unevaluated-string '{' declaration* '}'
-  | 'extern' unevaluated-string name-declaration 
+  | 'extern' unevaluated-string name-declaration
   ;
 
 attribute-specifier
   annotations (separator = ', ', substitute_count='10', description='Some text', dublication='vertical', auto_substitute='yes')
   : '[[' attribute-using-prefix ? attribute-list ']]'
-  | alignment-specifier 
+  | alignment-specifier
   ;
 
 alignment-specifier
   : 'alignas(' type-id three-dots ? ')'
-  | 'alignas(' constant-expression three-dots ? ')' 
+  | 'alignas(' constant-expression three-dots ? ')'
   ;
 
 attribute-using-prefix
-  : 'using' attribute-namespace ':' 
+  : 'using' attribute-namespace ':'
   ;
 
 attribute-list
   : attribute ?
   | attribute-list ',' attribute ?
   | attribute '...'
-  | attribute-list ',' attribute '...' 
+  | attribute-list ',' attribute '...'
   ;
 
 attribute
-  : attribute-token attribute-argument-clause ? 
+  : attribute-token attribute-argument-clause ?
   ;
 
 attribute-token
   : identifier
-  | attribute-scoped-token 
+  | attribute-scoped-token
   ;
 
 attribute-scoped-token
-  : attribute-namespace '::' identifier 
+  : attribute-namespace '::' identifier
   ;
 
 attribute-namespace
-  : identifier 
+  : identifier
   ;
 
 attribute-argument-clause
-  : '(' balanced-token-seq ? ')' 
+  : '(' balanced-token-seq ? ')'
   ;
 
 balanced-token-seq
   : balanced-token
-  | balanced-token-seq balanced-token 
+  | balanced-token-seq balanced-token
   ;
 
 non_balanced_token
@@ -1788,36 +1786,36 @@ balanced-token
 //
 
 module-declaration
-  : export-keyword ? module-keyword module-name module-partition ? attribute-specifier* ';' 
+  : export-keyword ? module-keyword module-name module-partition ? attribute-specifier* ';'
   ;
 
 module-name
-  : module-name-qualifier ? identifier 
+  : module-name-qualifier ? identifier
   ;
 
 module-partition
-  : ':' module-name-qualifier ? identifier 
+  : ':' module-name-qualifier ? identifier
   ;
 
 module-name-qualifier
   : identifier '.'
-  | module-name-qualifier identifier '.' 
+  | module-name-qualifier identifier '.'
   ;
 
 export-declaration
   : 'export' name-declaration
   | 'export {' declaration* '}'
-  | export-keyword module-import-declaration 
+  | export-keyword module-import-declaration
   ;
 
 module-import-declaration
   : import-keyword module-name attribute-specifier* ';'
   | import-keyword module-partition attribute-specifier* ';'
-  | import-keyword header-name attribute-specifier* ';' 
+  | import-keyword header-name attribute-specifier* ';'
   ;
 
 global-module-fragment
-  : module-keyword ';' declaration* 
+  : module-keyword ';' declaration*
   ;
 
 private-module-fragment
@@ -1830,35 +1828,35 @@ private-module-fragment
 
 class-name
   : identifier
-  | simple-template-id 
+  | simple-template-id
   ;
 
 class-specifier
-  : class-head '{' member-specification ? '}' 
+  : class-head '{' member-specification ? '}'
   ;
 
 class-head
   : class-key attribute-specifier* class-head-name class-virt-specifier ? base-clause ?
-  | class-key attribute-specifier* base-clause ? 
+  | class-key attribute-specifier* base-clause ?
   ;
 
 class-head-name
-  : nested-name-specifier ? class-name 
+  : nested-name-specifier ? class-name
   ;
 
 class-virt-specifier
-  : 'final' 
+  : 'final'
   ;
 
 class-key
   : 'class'
   | 'struct'
-  | 'union' 
+  | 'union'
   ;
 
 member-specification
   : member-declaration member-specification ?
-  | access-specifier ':' member-specification ? 
+  | access-specifier ':' member-specification ?
   ;
 
 member-declaration
@@ -1873,33 +1871,33 @@ member-declaration
   | deduction-guide
   | alias-declaration
   | opaque-enum-declaration
-  | empty-declaration 
+  | empty-declaration
   ;
 
 member-declarator-list
   : member-declarator
-  | member-declarator-list ',' member-declarator 
+  | member-declarator-list ',' member-declarator
   ;
 
 member-declarator
   : declarator virt-specifier-seq ? pure-specifier ?
   | declarator requires-clause
   | declarator brace-or-equal-initializer ?
-  | identifier ? attribute-specifier* ':' constant-expression brace-or-equal-initializer ? 
+  | identifier ? attribute-specifier* ':' constant-expression brace-or-equal-initializer ?
   ;
 
 virt-specifier-seq
   : virt-specifier
-  | virt-specifier-seq virt-specifier 
+  | virt-specifier-seq virt-specifier
   ;
 
 virt-specifier
   : 'override'
-  | 'final' 
+  | 'final'
   ;
 
 pure-specifier
-  : '= 0' 
+  : '= 0'
   ;
 
 friend-type-declaration
@@ -1918,24 +1916,24 @@ friend-type-specifier
   ;
 
 conversion-function-id
-  : 'operator' conversion-type-id 
+  : 'operator' conversion-type-id
   ;
 
 conversion-type-id
-  : type-specifier-seq conversion-declarator ? 
+  : type-specifier-seq conversion-declarator ?
   ;
 
 conversion-declarator
-  : ptr-operator conversion-declarator ? 
+  : ptr-operator conversion-declarator ?
   ;
 
 base-clause
-  : ':' base-specifier-list 
+  : ':' base-specifier-list
   ;
 
 base-specifier-list
   : base-specifier three-dots ?
-  | base-specifier-list ',' base-specifier three-dots ? 
+  | base-specifier-list ',' base-specifier three-dots ?
   ;
 
 virtual
@@ -1945,23 +1943,23 @@ virtual
 base-specifier
   : attribute-specifier* class-or-decltype
   | attribute-specifier* 'virtual' access-specifier ? class-or-decltype
-  | attribute-specifier* access-specifier virtual ? class-or-decltype 
+  | attribute-specifier* access-specifier virtual ? class-or-decltype
   ;
 
 class-or-decltype
   : nested-name-specifier ? type-name
   | nested-name-specifier 'template' simple-template-id
-  | decltype-specifier 
+  | decltype-specifier
   ;
 
 access-specifier
   : 'private'
   | 'protected'
-  | 'public' 
+  | 'public'
   ;
 
 ctor-initializer
-  : ':' mem-initializer-list 
+  : ':' mem-initializer-list
   ;
 
 mem-initializer-list
@@ -1971,12 +1969,12 @@ mem-initializer-list
 
 mem-initializer
   : mem-initializer-id '(' expression-list ? ')'
-  | mem-initializer-id braced-init-list 
+  | mem-initializer-id braced-init-list
   ;
 
 mem-initializer-id
   : class-or-decltype
-  | identifier 
+  | identifier
   ;
 
 //
@@ -1984,7 +1982,7 @@ mem-initializer-id
 //
 
 operator-function-id
-  : 'operator' operator 
+  : 'operator' operator
   ;
 
 operator
@@ -2031,12 +2029,12 @@ operator
   | '>>='
   | '++'
   | '--'
-  | ',' 
+  | ','
   ;
 
 literal-operator-id
   : 'operator' unevaluated-string identifier
-  | 'operator' user-defined-string-literal 
+  | 'operator' user-defined-string-literal
   ;
 
 //
@@ -2045,35 +2043,35 @@ literal-operator-id
 
 template-declaration
   : template-head declaration
-  | template-head concept-definition 
+  | template-head concept-definition
   ;
 
 template-head
-  : 'template<' template-parameter-list '>' requires-clause ? 
+  : 'template<' template-parameter-list '>' requires-clause ?
   ;
 
 template-parameter-list
   : template-parameter
-  | template-parameter-list ',' template-parameter 
+  | template-parameter-list ',' template-parameter
   ;
 
 requires-clause
-  : 'requires' constraint-logical-or-expression 
+  : 'requires' constraint-logical-or-expression
   ;
 
 constraint-logical-or-expression
   : constraint-logical-and-expression
-  | constraint-logical-or-expression '||' constraint-logical-and-expression 
+  | constraint-logical-or-expression '||' constraint-logical-and-expression
   ;
 
 constraint-logical-and-expression
   : primary-expression
-  | constraint-logical-and-expression '&&' primary-expression 
+  | constraint-logical-and-expression '&&' primary-expression
   ;
 
 template-parameter
   : type-parameter
-  | parameter-declaration 
+  | parameter-declaration
   ;
 
 type-parameter
@@ -2082,17 +2080,17 @@ type-parameter
   | type-constraint three-dots ? identifier ?
   | type-constraint identifier ? '=' type-id
   | template-head type-parameter-key three-dots ? identifier ?
-  | template-head type-parameter-key identifier ? '=' id-expression 
+  | template-head type-parameter-key identifier ? '=' id-expression
   ;
 
 type-parameter-key
   : 'class'
-  | 'typename' 
+  | 'typename'
   ;
 
 type-constraint
   : nested-name-specifier ? concept-name
-  | nested-name-specifier ? concept-name '<' template-argument-list ? '>' 
+  | nested-name-specifier ? concept-name '<' template-argument-list ? '>'
   ;
 
 //
@@ -2100,22 +2098,22 @@ type-constraint
 //
 
 simple-template-id
-  : template-name '<' template-argument-list ? '>' 
+  : template-name '<' template-argument-list ? '>'
   ;
 
 template-id
   : simple-template-id
   | operator-function-id '<' template-argument-list ? '>'
-  | literal-operator-id '<' template-argument-list ? '>' 
+  | literal-operator-id '<' template-argument-list ? '>'
   ;
 
 template-name
-  : identifier 
+  : identifier
   ;
 
 template-argument-list
   : template-argument three-dots ?
-  | template-argument-list ',' template-argument three-dots ? 
+  | template-argument-list ',' template-argument three-dots ?
   ;
 
 template-argument
@@ -2126,24 +2124,24 @@ template-argument
   ;
 
 constraint-expression
-  : logical-or-expression 
+  : logical-or-expression
   ;
 
 deduction-guide
-  : explicit-specifier ? template-name '(' parameter-declaration-clause ')->' simple-template-id ';' 
+  : explicit-specifier ? template-name '(' parameter-declaration-clause ')->' simple-template-id ';'
   ;
 
 concept-definition
-  : concept concept-name attribute-specifier* '=' constraint-expression ';' 
+  : concept concept-name attribute-specifier* '=' constraint-expression ';'
   ;
 
 concept-name
-  : identifier 
+  : identifier
   ;
 
 typename-specifier
   : 'typename' nested-name-specifier identifier
-  | 'typename' nested-name-specifier template ? simple-template-id 
+  | 'typename' nested-name-specifier template ? simple-template-id
   ;
 
 extern
@@ -2151,11 +2149,11 @@ extern
   ;
 
 explicit-instantiation
-  : extern ? 'template' declaration 
+  : extern ? 'template' declaration
   ;
 
 explicit-specialization
-  : 'template<>' declaration 
+  : 'template<>' declaration
   ;
 
 //
@@ -2163,30 +2161,30 @@ explicit-specialization
 //
 
 try-block
-  : 'try' compound-statement handler-seq 
+  : 'try' compound-statement handler-seq
   ;
 
 function-try-block
-  : 'try' ctor-initializer ? compound-statement handler-seq 
+  : 'try' ctor-initializer ? compound-statement handler-seq
   ;
 
 handler-seq
-  : handler handler-seq ? 
+  : handler handler-seq ?
   ;
 
 handler
-  : 'catch(' exception-declaration ')' compound-statement 
+  : 'catch(' exception-declaration ')' compound-statement
   ;
 
 exception-declaration
   : attribute-specifier* type-specifier-seq declarator
   | attribute-specifier* type-specifier-seq abstract-declarator ?
-  | '...' 
+  | '...'
   ;
 
 noexcept-specifier
   : 'noexcept(' constant-expression ')'
-  | 'noexcept' 
+  | 'noexcept'
   ;
 
 //
@@ -2195,31 +2193,31 @@ noexcept-specifier
 
 preprocessing-file
   : group ?
-  | module-file 
+  | module-file
   ;
 
 module-file
-  : pp-global-module-fragment ? pp-module group ? pp-private-module-fragment ? 
+  : pp-global-module-fragment ? pp-module group ? pp-private-module-fragment ?
   ;
 
 pp-global-module-fragment
-  : 'module;' new-line group ? 
+  : 'module;' new-line group ?
   ;
 
 pp-private-module-fragment
-  : 'module : private;' new-line group ? 
+  : 'module : private;' new-line group ?
   ;
 
 group
   : group-part
-  | group group-part 
+  | group group-part
   ;
 
 group-part
   : control-line
   | if-section
   | text-line
-  | '#' conditionally-supported-directive 
+  | '#' conditionally-supported-directive
   ;
 
 control-line
@@ -2234,22 +2232,22 @@ control-line
   | '#error' preprocessing-token* new-line
   | '#warning' preprocessing-token* new-line
   | '#pragma' preprocessing-token* new-line
-  | '#' new-line 
+  | '#' new-line
   ;
 
 if-section
-  : if-group elif-groups ? else-group ? endif-line 
+  : if-group elif-groups ? else-group ? endif-line
   ;
 
 if-group
   : '#if' constant-expression new-line group ?
   | '#ifdef' identifier new-line group ?
-  | '#ifndef' identifier new-line group ? 
+  | '#ifndef' identifier new-line group ?
   ;
 
 elif-groups
   : elif-group
-  | elif-groups elif-group 
+  | elif-groups elif-group
   ;
 
 elif-group
@@ -2259,19 +2257,19 @@ elif-group
   ;
 
 else-group
-  : '#else' new-line group ? 
+  : '#else' new-line group ?
   ;
 
 endif-line
-  : '#endif' new-line 
+  : '#endif' new-line
   ;
 
 text-line
-  : preprocessing-token* new-line 
+  : preprocessing-token* new-line
   ;
 
 conditionally-supported-directive
-  : preprocessing-token+ new-line 
+  : preprocessing-token+ new-line
   ;
 
 lparen
@@ -2279,30 +2277,30 @@ lparen
   ;
 
 new-line
-  : '<<<Enter the new-line \\n character.>>>' 
+  : '<<<Enter the new-line \\n character.>>>'
   ;
 
 defined-macro-expression
   : 'defined' identifier
-  | 'defined(' identifier ')' 
+  | 'defined(' identifier ')'
   ;
 
 h-preprocessing-token
-  : '<<<Enter any preprocessing-token other than >.>>>' 
+  : '<<<Enter any preprocessing-token other than >.>>>'
   ;
 
 header-name-tokens
   : string-literal
-  | '<' h-preprocessing-token+ '>' 
+  | '<' h-preprocessing-token+ '>'
   ;
 
 has-include-expression
   : '__has_include(' header-name ')'
-  | '__has_include(' header-name-tokens ')' 
+  | '__has_include(' header-name-tokens ')'
   ;
 
 has-attribute-expression
-  : '__has_cpp_attribute(' preprocessing-token+ ')' 
+  : '__has_cpp_attribute(' preprocessing-token+ ')'
   ;
 
 export
@@ -2310,7 +2308,7 @@ export
   ;
 
 pp-module
-  : export ? 'module' preprocessing-token* ';' new-line 
+  : export ? 'module' preprocessing-token* ';' new-line
   ;
 
 pp-import
