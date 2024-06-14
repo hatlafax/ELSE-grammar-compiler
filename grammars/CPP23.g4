@@ -17,110 +17,113 @@ grammar CPP23;
 // A.3 Lexical conventions
 //
 
-n-char
-  : '<<<Enter a n-char sequence, that is translation characters except of { or \\n.>>>'
+n_char
+  : '<<<Enter a n_char sequence, that is translation characters except of { or \\n.>>>'
   ;
 
-named-universal-character
-  : '\\N{' n-char '}'
+named_universal_character
+  : '\\N{' n_char '}'
   ;
 
-hexadecimal-digit
+hexadecimal_digit
   : '<<<Enter a hexadecimal digit, i.e. any number of hex characters [0-9a-fA-F].>>>'
   ;
 
-hex-quad
+hex_quad
   : '<<<Enter exactly four hex number characters [0-9a-fA-F], i.e. NNNN.>>>'
   ;
 
-hex-quad-quad
+hex_quad_quad
   : '<<<Enter exactly eight hex number characters [0-9a-fA-F], i.e. NNNNNNNN.>>>'
   ;
 
-universal-character-name
-  : '\\u' hex-quad
-  | '\\U' hex-quad-quad
-  | '\\u{' hexadecimal-digit '}'
-  | named-universal-character
+universal_character_name
+  : '\\u' hex_quad
+  | '\\U' hex_quad_quad
+  | '\\u{' hexadecimal_digit '}'
+  | named_universal_character
   ;
 
-non-whitespace-character-literal
-  : '<<<Each non-whitespace character that cannot be one of the above.>>>'
+non_whitespace_character_literal
+  : '<<<Each non_whitespace character that cannot be one of the above.>>>'
   ;
 
-preprocessing-token
-  : header-name
-  | import-keyword
-  | module-keyword
-  | export-keyword
+preprocessing_token
+  : header_name
+  | import_keyword
+  | module_keyword
+  | export_keyword
   | identifier
-  | pp-number
-  | character-literal
-  | user-defined-character-literal
-  | string-literal
-  | user-defined-string-literal
-  | preprocessing-op-or-punc
-  | non-whitespace-character-literal
+  | pp_number
+  | character_literal
+  | user_defined_character_literal
+  | string_literal
+  | user_defined_string_literal
+  | preprocessing_op_or_punc
+  | non_whitespace_character_literal
   ;
 
 token
   : identifier
   | keyword
   | literal
-  | operator-or-punctuator
+  | operator_or_punctuator
   ;
 
-h-char
-  : '<<<Enter a h-char sequence, i.e. source characters except \\n and > characters.>>>'
+h_char
+  : '<<<Enter a h_char sequence, i.e. source characters except \\n and > characters.>>>'
   ;
 
-q-char
-  : '<<<Enter a q-char sequence, i.e. source characters except \\n and quotation mark " characters.>>>'
+q_char
+  : '<<<Enter a q_char sequence, i.e. source characters except \\n and quotation mark " characters.>>>'
   ;
 
-header-name
-  : '<' h-char '>'
-  | '"' q-char '"'
+header_name
+  : '<' h_char '>'
+  | '"' q_char '"'
   ;
 
-pp-number
+pp_number
   : digit
   | '.' digit
-  | pp-number digit
-  | pp-number identifier-nondigit
-  | pp-number '\'' digit
-  | pp-number '\'' nondigit
-  | pp-number 'e' sign
-  | pp-number 'E' sign
-  | pp-number 'p' sign
-  | pp-number 'P' sign
-  | pp-number '.'
+  | pp_number digit
+  | pp_number identifier_nondigit
+  | pp_number '\'' digit
+  | pp_number '\'' nondigit
+  | pp_number 'e' sign
+  | pp_number 'E' sign
+  | pp_number 'p' sign
+  | pp_number 'P' sign
+  | pp_number '.'
   ;
 
 identifier
-  : identifier-start
-  | identifier identifier-continue
+  : identifier_start
+  | identifier identifier_continue
   ;
 
-translation-character-xid-start
-  : '<<<Enter an element of the translation character set with the Unicode property XID-Start.>>>'
+identifier_nondigit
+  : '<<<Enter an identifier that is not a digit.>>>'
   ;
 
-translation-character-xid-continue
-  : '<<<Enter an element of the translation character set with the Unicode property XID-Continue.>>>'
+translation_character_xid_start
+  : '<<<Enter an element of the translation character set with the Unicode property XID_Start.>>>'
+  ;
+
+translation_character_xid_continue
+  : '<<<Enter an element of the translation character set with the Unicode property XID_Continue.>>>'
   ;
 
 
-identifier-start
+identifier_start
   : nondigit
-  | translation-character-xid-start
+  | translation_character_xid_start
   ;
 
-
-identifier-continue
+identifier_continue
   : digit
   | nondigit
-  | translation-character-xid-continue
+  | translation_character_xid_continue
   ;
 
 nondigit
@@ -274,26 +277,24 @@ keyword
   | 'volatile'
   | 'wchar_t'
   | 'while'
-  | import-keyword
-  | module-keyword
-  | export-keyword
+  | import_keyword
+  | module_keyword
+  | export_keyword
   ;
 
-preprocessing-op-or-punc
-  :
-  preprocessing-operator
-  |
-  operator-or-punctuator
+preprocessing_op_or_punc
+  : preprocessing_operator
+  | operator_or_punctuator
   ;
 
-preprocessing-operator
+preprocessing_operator
   : '#'
   | '##'
   | '%:'
   | '%:%:'
   ;
 
-operator-or-punctuator
+operator_or_punctuator
   : '{'
   | '}'
   | '['
@@ -362,52 +363,52 @@ operator-or-punctuator
   ;
 
 literal
-  : integer-literal
-  | character-literal
-  | floating-point-literal
-  | string-literal
-  | boolean-literal
-  | pointer-literal
-  | user-defined-literal
+  : integer_literal
+  | character_literal
+  | floating_point_literal
+  | string_literal
+  | boolean_literal
+  | pointer_literal
+  | user_defined_literal
   ;
 
-integer-literal
-  : binary-literal integer-suffix ?
-  | octal-literal integer-suffix ?
-  | decimal-literal integer-suffix ?
-  | hexadecimal-literal integer-suffix ?
+integer_literal
+  : binary_literal integer_suffix ?
+  | octal_literal integer_suffix ?
+  | decimal_literal integer_suffix ?
+  | hexadecimal_literal integer_suffix ?
   ;
 
-simple-quote-char
+simple_quote_char
   : '\''
   ;
 
-binary-literal
-  : '0b' binary-digit
-  | '0B' binary-digit
-  | binary-literal simple-quote-char ? binary-digit
+binary_literal
+  : '0b' binary_digit
+  | '0B' binary_digit
+  | binary_literal simple_quote_char ? binary_digit
   ;
 
-octal-literal
+octal_literal
   : '0'
-  | octal-literal simple-quote-char ? octal-digit
+  | octal_literal simple_quote_char ? octal_digit
   ;
 
-decimal-literal
-  : nonzero-digit
-  | decimal-literal simple-quote-char ? digit
+decimal_literal
+  : nonzero_digit
+  | decimal_literal simple_quote_char ? digit
   ;
 
-hexadecimal-literal
-  : hexadecimal-prefix hexadecimal-digit-sequence
+hexadecimal_literal
+  : hexadecimal_prefix hexadecimal_digit_sequence
   ;
 
-binary-digit
+binary_digit
   : '0'
   | '1'
   ;
 
-octal-digit
+octal_digit
   : '0'
   | '1'
   | '2'
@@ -418,7 +419,7 @@ octal-digit
   | '7'
   ;
 
-nonzero-digit
+nonzero_digit
   : '1'
   | '2'
   | '3'
@@ -430,102 +431,77 @@ nonzero-digit
   | '9'
   ;
 
-hexadecimal-prefix
+hexadecimal_prefix
   : '0x'
   | '0X'
   ;
 
-hexadecimal-digit-sequence
-  : hexadecimal-digit
-  | hexadecimal-digit-sequence simple-quote-char ? hexadecimal-digit
+hexadecimal_digit_sequence
+  : hexadecimal_digit
+  | hexadecimal_digit_sequence simple_quote_char ? hexadecimal_digit
   ;
 
-hexadecimal-digit
-  : '0'
-  | '1'
-  | '2'
-  | '3'
-  | '4'
-  | '5'
-  | '6'
-  | '7'
-  | '8'
-  | '9'
-  | 'a'
-  | 'b'
-  | 'c'
-  | 'd'
-  | 'e'
-  | 'f'
-  | 'A'
-  | 'B'
-  | 'C'
-  | 'D'
-  | 'E'
-  | 'F'
+integer_suffix
+  : unsigned_suffix long_suffix ?
+  | unsigned_suffix long_long_suffix ?
+  | unsigned_suffix size_suffix ?
+  | long_suffix unsigned_suffix ?
+  | long_long_suffix unsigned_suffix ?
+  | size_suffix unsigned_suffix ?
   ;
 
-integer-suffix
-  : unsigned-suffix long-suffix ?
-  | unsigned-suffix long-long-suffix ?
-  | unsigned-suffix size-suffix ?
-  | long-suffix unsigned-suffix ?
-  | long-long-suffix unsigned-suffix ?
-  | size-suffix unsigned-suffix ?
-  ;
-
-unsigned-suffix
+unsigned_suffix
   : 'u'
   | 'U'
   ;
 
-long-suffix
+long_suffix
   : 'l'
   | 'L'
   ;
 
-long-long-suffix
+long_long_suffix
   : 'll'
   | 'LL'
   ;
 
-size-suffix
+size_suffix
   : 'z'
   | 'Z'
   ;
 
-character-literal
-  : encoding-prefix ? '\'' c-char+ '\''
+character_literal
+  : encoding_prefix ? '\'' c_char+ '\''
   ;
 
-encoding-prefix
+encoding_prefix
   : 'u8'
   | 'u'
   | 'U'
   | 'L'
   ;
 
-c-char
-  : basic-c-char
-  | escape-sequence
-  | universal-character-name
+c_char
+  : basic_c_char
+  | escape_sequence
+  | universal_character_name
   ;
 
-basic-c-char
-  : '<<<Enter a basic source character except the single-quote \', backslash \\, or new-line \\n character.>>>'
+basic_c_char
+  : '<<<Enter a basic source character except the single_quote \', backslash \\, or new_line \\n character.>>>'
   ;
 
-escape-sequence
-  : simple-escape-sequence
-  | numeric-escape-sequence
-  | conditional-escape-sequence
+escape_sequence
+  : simple_escape_sequence
+  | numeric_escape_sequence
+  | conditional_escape_sequence
   ;
 
-simple-escape-sequence
-  : '\\' simple-escape-sequence-char
+simple_escape_sequence
+  : '\\' simple_escape_sequence_char
   ;
 
-simple-escape-sequence-char
+simple_escape_sequence_char
   : '\''
   | '"'
   | '?'
@@ -539,64 +515,64 @@ simple-escape-sequence-char
   | 'v'
   ;
 
-numeric-escape-sequence
-  : octal-escape-sequence
-  | hexadecimal-escape-sequence
+numeric_escape_sequence
+  : octal_escape_sequence
+  | hexadecimal_escape_sequence
   ;
 
-octal-escape-sequence
-  : '\\' octal-digit
-  | '\\' octal-digit octal-digit
-  | '\\' octal-digit octal-digit octal-digit
-  | '\\o{' octal-digit+ '}'
+octal_escape_sequence
+  : '\\' octal_digit
+  | '\\' octal_digit octal_digit
+  | '\\' octal_digit octal_digit octal_digit
+  | '\\o{' octal_digit+ '}'
   ;
 
-hexadecimal-escape-sequence
-  : '\\x' hexadecimal-digit
-  | '\\x{' hexadecimal-digit '}'
+hexadecimal_escape_sequence
+  : '\\x' hexadecimal_digit
+  | '\\x{' hexadecimal_digit '}'
   ;
 
-conditional-escape-sequence
-  : '\\' conditional-escape-sequence-char
+conditional_escape_sequence
+  : '\\' conditional_escape_sequence_char
   ;
 
-conditional-escape-sequence-char
-  : '<<<Enter a basic source character that is not an octal-digit, a simple-escape-sequence-char, or the characters N, o, u, U, or x.>>>'
+conditional_escape_sequence_char
+  : '<<<Enter a basic source character that is not an octal_digit, a simple_escape_sequence_char, or the characters N, o, u, U, or x.>>>'
   ;
 
-floating-point-literal
-  : decimal-floating-point-literal
-  | hexadecimal-floating-point-literal
+floating_point_literal
+  : decimal_floating_point_literal
+  | hexadecimal_floating_point_literal
   ;
 
-decimal-floating-point-literal
-  : fractional-constant exponent-part ? floating-point-suffix ?
-  | digit-sequence exponent-part floating-point-suffix ?
+decimal_floating_point_literal
+  : fractional_constant exponent_part ? floating_point_suffix ?
+  | digit_sequence exponent_part floating_point_suffix ?
   ;
 
-hexadecimal-floating-point-literal
-  : hexadecimal-prefix hexadecimal-fractional-constant binary-exponent-part floating-point-suffix ?
-  | hexadecimal-prefix hexadecimal-digit-sequence binary-exponent-part floating-point-suffix ?
+hexadecimal_floating_point_literal
+  : hexadecimal_prefix hexadecimal_fractional_constant binary_exponent_part floating_point_suffix ?
+  | hexadecimal_prefix hexadecimal_digit_sequence binary_exponent_part floating_point_suffix ?
   ;
 
-fractional-constant
-  : digit-sequence ? '.' digit-sequence
-  | digit-sequence '.'
+fractional_constant
+  : digit_sequence ? '.' digit_sequence
+  | digit_sequence '.'
   ;
 
-hexadecimal-fractional-constant
-  : hexadecimal-digit-sequence ? '.' hexadecimal-digit-sequence
-  | hexadecimal-digit-sequence '.'
+hexadecimal_fractional_constant
+  : hexadecimal_digit_sequence ? '.' hexadecimal_digit_sequence
+  | hexadecimal_digit_sequence '.'
   ;
 
-exponent-part
-  : 'e' sign ? digit-sequence
-  | 'E' sign ? digit-sequence
+exponent_part
+  : 'e' sign ? digit_sequence
+  | 'E' sign ? digit_sequence
   ;
 
-binary-exponent-part
-  : 'p' sign ? digit-sequence
-  | 'P' sign ? digit-sequence
+binary_exponent_part
+  : 'p' sign ? digit_sequence
+  | 'P' sign ? digit_sequence
   ;
 
 sign
@@ -604,12 +580,12 @@ sign
   | '-'
   ;
 
-digit-sequence
+digit_sequence
   : digit
-  | digit-sequence simple-quote-char ? digit
+  | digit_sequence simple_quote_char ? digit
   ;
 
-floating-point-suffix
+floating_point_suffix
   : 'f'
   | 'l'
   | 'f16'
@@ -626,72 +602,72 @@ floating-point-suffix
   | 'BF16'
   ;
 
-string-literal
-  : encoding-prefix ? '"' s-char* '"'
-  | encoding-prefix ? 'R' raw-string
+string_literal
+  : encoding_prefix ? '"' s_char* '"'
+  | encoding_prefix ? 'R' raw_string
   ;
 
-s-char
-  : basic-s-char
-  | escape-sequence
-  | universal-character-name
+s_char
+  : basic_s_char
+  | escape_sequence
+  | universal_character_name
   ;
 
-basic-s-char
-  : '<<<Enter a basic source character except the double-quote ", backslash \\, or new-line \\n character.>>>'
+basic_s_char
+  : '<<<Enter a basic source character except the double_quote ", backslash \\, or new_line \\n character.>>>'
   ;
 
-raw-string
-  : '"' d-char* '(' r-char* ')' d-char* '"'
+raw_string
+  : '"' d_char* '(' r_char* ')' d_char* '"'
   ;
 
-r-char
-  : '<<<Enter a sequence of source characters, except a right parenthesis ) followed by the initial d-char-sequence (which may be empty) followed by a double quote ".>>>'
+r_char
+  : '<<<Enter a sequence of source characters, except a right parenthesis ) followed by the initial d_char sequence (which may be empty) followed by a double quote ".>>>'
   ;
 
-d-char
+d_char
   : '<<<Enter a sequence of basic source characters except: space, the left parenthesis (, the right parenthesis ), the backslash \\, and the control characters representing horizontal tab, vertical tab, form feed, and newline.>>>'
   ;
 
-boolean-literal
+boolean_literal
   : 'false'
   | 'true'
   ;
 
-pointer-literal
+pointer_literal
   : 'nullptr'
   ;
 
-user-defined-literal
-  : user-defined-integer-literal
-  | user-defined-floating-point-literal
-  | user-defined-string-literal
-  | user-defined-character-literal
+user_defined_literal
+  : user_defined_integer_literal
+  | user_defined_floating_point_literal
+  | user_defined_string_literal
+  | user_defined_character_literal
   ;
 
-user-defined-integer-literal
-  : decimal-literal ud-suffix
-  | octal-literal ud-suffix
-  | hexadecimal-literal ud-suffix
-  | binary-literal ud-suffix
+user_defined_integer_literal
+  : decimal_literal ud_suffix
+  | octal_literal ud_suffix
+  | hexadecimal_literal ud_suffix
+  | binary_literal ud_suffix
   ;
 
-user-defined-floating-point-literal
-  : fractional-constant exponent-part ? ud-suffix
-  | digit-sequence exponent-part ud-suffix
-  | hexadecimal-prefix hexadecimal-fractional-constant binary-exponent-part ud-suffix
-  | hexadecimal-prefix hexadecimal-digit-sequence binary-exponent-part ud-suffix
+user_defined_floating_point_literal
+  : fractional_constant exponent_part ? ud_suffix
+  | digit_sequence exponent_part ud_suffix
+  | hexadecimal_prefix hexadecimal_fractional_constant binary_exponent_part ud_suffix
+  | hexadecimal_prefix hexadecimal_digit_sequence binary_exponent_part ud_suffix
   ;
 
-user-defined-string-literal
-  : string-literal ud-suffix
+user_defined_string_literal
+  : string_literal ud_suffix
   ;
 
-user-defined-character-literal
-  : character-literal ud-suffix
+user_defined_character_literal
+  : character_literal ud_suffix
   ;
 
-ud-suffix
+ud_suffix
   : identifier
   ;
 
@@ -699,129 +675,129 @@ ud-suffix
 // A.4 Basics
 //
 
-translation-unit
+translation_unit
   : declaration*
-  | global-module-fragment ? module-declaration declaration* private-module-fragment ?
+  | global_module_fragment ? module_declaration declaration* private_module_fragment ?
   ;
 
 //
 // A.5 Expressions
 //
 
-primary-expression
+primary_expression
   : literal
   | 'this'
   | '(' expression ')'
-  | id-expression
-  | lambda-expression
-  | fold-expression
-  | requires-expression
+  | id_expression
+  | lambda_expression
+  | fold_expression
+  | requires_expression
   ;
 
-id-expression
-  : unqualified-id
-  | qualified-id
-  | pack-index-expression
+id_expression
+  : unqualified_id
+  | qualified_id
+  | pack_index_expression
   ;
 
-unqualified-id
+unqualified_id
   : identifier
-  | operator-function-id
-  | conversion-function-id
-  | literal-operator-id
-  | '~' type-name
-  | '~' computed-type-specifier
-  | template-id
+  | operator_function_id
+  | conversion_function_id
+  | literal_operator_id
+  | '~' type_name
+  | '~' computed_type_specifier
+  | template_id
   ;
 
 template
   : 'template'
   ;
 
-qualified-id
-  : nested-name-specifier template ? unqualified-id
+qualified_id
+  : nested_name_specifier template ? unqualified_id
   ;
 
-nested-name-specifier
+nested_name_specifier
   : '::'
-  | type-name '::'
-  | namespace-name '::'
-  | computed-type-specifier '::'
-  | nested-name-specifier identifier '::'
-  | nested-name-specifier template ? simple-template-id '::'
+  | type_name '::'
+  | namespace_name '::'
+  | computed_type_specifier '::'
+  | nested_name_specifier identifier '::'
+  | nested_name_specifier template ? simple_template_id '::'
   ;
 
-pack-index-expression
-  : id-expression '... [' constant-expression ']'
+pack_index_expression
+  : id_expression '... [' constant_expression ']'
   ;
 
-lambda-expression
-  : lambda-introducer attribute-specifier* lambda-declarator compound-statement
-  | lambda-introducer '<' template-parameter-list '>' requires-clause ? attribute-specifier* lambda-declarator compound-statement
+lambda_expression
+  : lambda_introducer attribute_specifier* lambda_declarator compound_statement
+  | lambda_introducer '<' template_parameter_list '>' requires_clause ? attribute_specifier* lambda_declarator compound_statement
   ;
 
-lambda-introducer
-  : '[' lambda-capture ? ']'
+lambda_introducer
+  : '[' lambda_capture ? ']'
   ;
 
-lambda-declarator
-  : lambda-specifier+ noexcept-specifier ? attribute-specifier* trailing-return-type ?
-  | noexcept-specifier attribute-specifier* trailing-return-type ?
-  | trailing-return-type ?
-  | '(' parameter-declaration-clause ')' lambda-specifier* noexcept-specifier ? attribute-specifier* trailing-return-type ? requires-clause ?
+lambda_declarator
+  : lambda_specifier+ noexcept_specifier ? attribute_specifier* trailing_return_type ?
+  | noexcept_specifier attribute_specifier* trailing_return_type ?
+  | trailing_return_type ?
+  | '(' parameter_declaration_clause ')' lambda_specifier* noexcept_specifier ? attribute_specifier* trailing_return_type ? requires_clause ?
   ;
 
-lambda-specifier
+lambda_specifier
   : 'consteval'
   | 'constexpr'
   | 'mutable'
   | 'static'
   ;
 
-lambda-capture
-  : capture-default
-  | capture-list
-  | capture-default ',' capture-list
+lambda_capture
+  : capture_default
+  | capture_list
+  | capture_default ',' capture_list
   ;
 
-capture-default
+capture_default
   : '&'
   | '='
   ;
 
-capture-list
+capture_list
   : capture
-  | capture-list ',' capture
+  | capture_list ',' capture
   ;
 
 capture
-  : simple-capture
-  | init-capture
+  : simple_capture
+  | init_capture
   ;
 
-simple-capture
-  : identifier three-dots ?
-  | '&' identifier three-dots ?
+simple_capture
+  : identifier three_dots ?
+  | '&' identifier three_dots ?
   | 'this'
   | '*this'
   ;
 
-and-three-dots
+and_three_dots
   : '& ...'
   ;
 
-init-capture
-  : three-dots ? identifier initializer
-  | and-three-dots ? identifier initializer
+init_capture
+  : three_dots ? identifier initializer
+  | and_three_dots ? identifier initializer
   ;
 
-fold-expression
-  : '(' cast-expression fold-operator '...)'
-  | '(...' fold-operator cast-expression ')'
-  | '(' cast-expression fold-operator '...' fold-operator cast-expression ')'
+fold_expression
+  : '(' cast_expression fold_operator '...)'
+  | '(...' fold_operator cast_expression ')'
+  | '(' cast_expression fold_operator '...' fold_operator cast_expression ')'
   ;
 
-fold-operator
+fold_operator
   : '+'
   | '-'
   | '*'
@@ -856,93 +832,93 @@ fold-operator
   | '->*'
   ;
 
-requires-expression
-  : 'requires' requirement-parameter-list ? requirement-body
+requires_expression
+  : 'requires' requirement_parameter_list ? requirement_body
   ;
 
-requirement-parameter-list
-  : '(' parameter-declaration-clause ')'
+requirement_parameter_list
+  : '(' parameter_declaration_clause ')'
   ;
 
-requirement-body
+requirement_body
   : '{' requirement+ '}'
   ;
 
 requirement
-  : simple-requirement
-  | type-requirement
-  | compound-requirement
-  | nested-requirement
+  : simple_requirement
+  | type_requirement
+  | compound_requirement
+  | nested_requirement
   ;
 
-simple-requirement
+simple_requirement
   : expression ';'
   ;
 
-type-requirement
-  : 'typename' nested-name-specifier ? type-name ';'
+type_requirement
+  : 'typename' nested_name_specifier ? type_name ';'
   ;
 
-compound-requirement
-  : '{' expression '}' noexcept ? return-type-requirement ? ';'
+compound_requirement
+  : '{' expression '}' noexcept ? return_type_requirement ? ';'
   ;
 
-return-type-requirement
-  : '->' type-constraint
+return_type_requirement
+  : '->' type_constraint
   ;
 
-nested-requirement
-  : 'requires' constraint-expression ';'
+nested_requirement
+  : 'requires' constraint_expression ';'
   ;
 
-dot-template
+dot_template
   : '.template'
   ;
 
-arrow-template
+arrow_template
   : '->template'
   ;
 
-postfix-expression
-  : primary-expression
-  | postfix-expression '[' expression-list ? ']'
-  | postfix-expression '(' expression-list ? ')'
-  | simple-type-specifier '(' expression-list ? ')'
-  | typename-specifier '(' expression-list ? ')'
-  | simple-type-specifier braced-init-list
-  | typename-specifier braced-init-list
-  | postfix-expression dot-template ? id-expression
-  | postfix-expression arrow-template ? id-expression
-  | postfix-expression '++'
-  | postfix-expression '--'
-  | 'dynamic-cast<' type-id '>(' expression ')'
-  | 'static-cast<' type-id '>(' expression ')'
-  | 'reinterpret-cast<' type-id '>(' expression ')'
-  | 'const-cast<' type-id '>(' expression ')'
+postfix_expression
+  : primary_expression
+  | postfix_expression '[' expression_list ? ']'
+  | postfix_expression '(' expression_list ? ')'
+  | simple_type_specifier '(' expression_list ? ')'
+  | typename_specifier '(' expression_list ? ')'
+  | simple_type_specifier braced_init_list
+  | typename_specifier braced_init_list
+  | postfix_expression dot_template ? id_expression
+  | postfix_expression arrow_template ? id_expression
+  | postfix_expression '++'
+  | postfix_expression '--'
+  | 'dynamic_cast<' type_id '>(' expression ')'
+  | 'static_cast<' type_id '>(' expression ')'
+  | 'reinterpret_cast<' type_id '>(' expression ')'
+  | 'const_cast<' type_id '>(' expression ')'
   | 'typeid(' expression ')'
-  | 'typeid(' type-id ')'
+  | 'typeid(' type_id ')'
   ;
 
-expression-list
-  : initializer-list
+expression_list
+  : initializer_list
   ;
 
-unary-expression
-  : postfix-expression
-  | unary-operator cast-expression
-  | '++' cast-expression
-  | '--' cast-expression
-  | await-expression
-  | 'sizeof' unary-expression
-  | 'sizeof(' type-id ')'
+unary_expression
+  : postfix_expression
+  | unary_operator cast_expression
+  | '++' cast_expression
+  | '--' cast_expression
+  | await_expression
+  | 'sizeof' unary_expression
+  | 'sizeof(' type_id ')'
   | 'sizeof...(' identifier ')'
-  | 'alignof(' type-id ')'
-  | noexcept-expression
-  | new-expression
-  | delete-expression
+  | 'alignof(' type_id ')'
+  | noexcept_expression
+  | new_expression
+  | delete_expression
   ;
 
-unary-operator
+unary_operator
   : '*'
   | '&'
   | '+'
@@ -951,147 +927,147 @@ unary-operator
   | '~'
   ;
 
-await-expression
-  : 'co_await' cast-expression
+await_expression
+  : 'co_await' cast_expression
   ;
 
-noexcept-expression
+noexcept_expression
   : 'noexcept(' expression ')'
   ;
 
-nesting-operator
+nesting_operator
   : '::'
   ;
 
-new-expression
-  : nesting-operator ? 'new' new-placement ? new-type-id new-initializer ?
-  | nesting-operator ? 'new' new-placement ? '(' type-id ')' new-initializer ?
+new_expression
+  : nesting_operator ? 'new' new_placement ? new_type_id new_initializer ?
+  | nesting_operator ? 'new' new_placement ? '(' type_id ')' new_initializer ?
   ;
 
-new-placement
-  : '(' expression-list ')'
+new_placement
+  : '(' expression_list ')'
   ;
 
-new-type-id
-  : type-specifier-seq new-declarator ?
+new_type_id
+  : type_specifier_seq new_declarator ?
   ;
 
-new-declarator
-  : ptr-operator new-declarator ?
-  | noptr-new-declarator
+new_declarator
+  : ptr_operator new_declarator ?
+  | noptr_new_declarator
   ;
 
-noptr-new-declarator
-  : '[' expression ? ']' attribute-specifier*
-  | noptr-new-declarator '[' constant-expression ']' attribute-specifier*
+noptr_new_declarator
+  : '[' expression ? ']' attribute_specifier*
+  | noptr_new_declarator '[' constant_expression ']' attribute_specifier*
   ;
 
-new-initializer
-  : '(' expression-list ? ')'
-  | braced-init-list
+new_initializer
+  : '(' expression_list ? ')'
+  | braced_init_list
   ;
 
-delete-expression
-  : nesting-operator ? 'delete' cast-expression
-  | nesting-operator ? 'delete[]' cast-expression
+delete_expression
+  : nesting_operator ? 'delete' cast_expression
+  | nesting_operator ? 'delete[]' cast_expression
   ;
 
-cast-expression
-  : unary-expression
-  | '(' type-id ')' cast-expression
+cast_expression
+  : unary_expression
+  | '(' type_id ')' cast_expression
   ;
 
-pm-expression
-  : cast-expression
-  | pm-expression '.*' cast-expression
-  | pm-expression '->*' cast-expression
+pm_expression
+  : cast_expression
+  | pm_expression '.*' cast_expression
+  | pm_expression '->*' cast_expression
   ;
 
-multiplicative-expression
-  : pm-expression
-  | multiplicative-expression '*' pm-expression
-  | multiplicative-expression '/' pm-expression
-  | multiplicative-expression '%' pm-expression
+multiplicative_expression
+  : pm_expression
+  | multiplicative_expression '*' pm_expression
+  | multiplicative_expression '/' pm_expression
+  | multiplicative_expression '%' pm_expression
   ;
 
-additive-expression
-  : multiplicative-expression
-  | additive-expression '+' multiplicative-expression
-  | additive-expression '-' multiplicative-expression
+additive_expression
+  : multiplicative_expression
+  | additive_expression '+' multiplicative_expression
+  | additive_expression '-' multiplicative_expression
   ;
 
-shift-expression
-  : additive-expression
-  | shift-expression '<<' additive-expression
-  | shift-expression '>>' additive-expression
+shift_expression
+  : additive_expression
+  | shift_expression '<<' additive_expression
+  | shift_expression '>>' additive_expression
   ;
 
-compare-expression
-  : shift-expression
-  | compare-expression '<=>' shift-expression
+compare_expression
+  : shift_expression
+  | compare_expression '<=>' shift_expression
   ;
 
-relational-expression
-  : compare-expression
-  | relational-expression '<' compare-expression
-  | relational-expression '>' compare-expression
-  | relational-expression '<=' compare-expression
-  | relational-expression '>=' compare-expression
+relational_expression
+  : compare_expression
+  | relational_expression '<' compare_expression
+  | relational_expression '>' compare_expression
+  | relational_expression '<=' compare_expression
+  | relational_expression '>=' compare_expression
   ;
 
-equality-expression
-  : relational-expression
-  | equality-expression '==' relational-expression
-  | equality-expression '!=' relational-expression
+equality_expression
+  : relational_expression
+  | equality_expression '==' relational_expression
+  | equality_expression '!=' relational_expression
   ;
 
-and-expression
-  : equality-expression
-  | and-expression '&' equality-expression
+and_expression
+  : equality_expression
+  | and_expression '&' equality_expression
   ;
 
-exclusive-or-expression
-  : and-expression
-  | exclusive-or-expression '^' and-expression
+exclusive_or_expression
+  : and_expression
+  | exclusive_or_expression '^' and_expression
   ;
 
-inclusive-or-expression
-  : exclusive-or-expression
-  | inclusive-or-expression '|' exclusive-or-expression
+inclusive_or_expression
+  : exclusive_or_expression
+  | inclusive_or_expression '|' exclusive_or_expression
   ;
 
-logical-and-expression
-  : inclusive-or-expression
-  | logical-and-expression '&&' inclusive-or-expression
+logical_and_expression
+  : inclusive_or_expression
+  | logical_and_expression '&&' inclusive_or_expression
   ;
 
-logical-or-expression
-  : logical-and-expression
-  | logical-or-expression '||' logical-and-expression
+logical_or_expression
+  : logical_and_expression
+  | logical_or_expression '||' logical_and_expression
   ;
 
-conditional-expression
-  : logical-or-expression
-  | logical-or-expression '?' expression ':' assignment-expression
+conditional_expression
+  : logical_or_expression
+  | logical_or_expression '?' expression ':' assignment_expression
   ;
 
-yield-expression
-  : 'co_yield' assignment-expression
-  | 'co_yield' braced-init-list
+yield_expression
+  : 'co_yield' assignment_expression
+  | 'co_yield' braced_init_list
   ;
 
-throw-expression
-  : 'throw' assignment-expression ?
+throw_expression
+  : 'throw' assignment_expression ?
   ;
 
-assignment-expression
-  : conditional-expression
-  | yield-expression
-  | throw-expression
-  | logical-or-expression assignment-operator initializer-clause
+assignment_expression
+  : conditional_expression
+  | yield_expression
+  | throw_expression
+  | logical_or_expression assignment_operator initializer_clause
   ;
 
-assignment-operator
+assignment_operator
   : '='
   | '*='
   | '/='
@@ -1106,100 +1082,100 @@ assignment-operator
   ;
 
 expression
-  : assignment-expression
-  | expression ',' assignment-expression
+  : assignment_expression
+  | expression ',' assignment_expression
   ;
 
-constant-expression
-  : conditional-expression
+constant_expression
+  : conditional_expression
   ;
 
 statement
-  : labeled-statement
-  | attribute-specifier* expression-statement
-  | attribute-specifier* compound-statement
-  | attribute-specifier* selection-statement
-  | attribute-specifier* iteration-statement
-  | attribute-specifier* jump-statement
-  | declaration-statement
-  | attribute-specifier* try-block
+  : labeled_statement
+  | attribute_specifier* expression_statement
+  | attribute_specifier* compound_statement
+  | attribute_specifier* selection_statement
+  | attribute_specifier* iteration_statement
+  | attribute_specifier* jump_statement
+  | declaration_statement
+  | attribute_specifier* try_block
   ;
 
-init-statement
-  : expression-statement
-  | simple-declaration
-  | alias-declaration
+init_statement
+  : expression_statement
+  | simple_declaration
+  | alias_declaration
   ;
 
 condition
   : expression
-  | attribute-specifier* decl-specifier-seq declarator brace-or-equal-initializer
+  | attribute_specifier* decl_specifier_seq declarator brace_or_equal_initializer
   ;
 
 label
-  : attribute-specifier* identifier ':'
-  | attribute-specifier* 'case' constant-expression ':'
-  | attribute-specifier* 'default:'
+  : attribute_specifier* identifier ':'
+  | attribute_specifier* 'case' constant_expression ':'
+  | attribute_specifier* 'default:'
   ;
 
-labeled-statement
+labeled_statement
   : label statement
   ;
 
-expression-statement
+expression_statement
   : expression ? ';'
   ;
 
-compound-statement
+compound_statement
   : '{' statement* label* '}'
   ;
 
-if-constexpr
+if_constexpr
   : 'if constexpr'
   ;
 
-if-exlamation-mark
+if_exlamation_mark
   : 'if !'
   ;
 
-selection-statement
-  : if-constexpr ? '(' init-statement ? condition ')' statement
-  | if-constexpr ? '(' init-statement ? condition ')' statement 'else' statement
-  | if-exlamation-mark ? 'consteval' compound-statement
-  | if-exlamation-mark ? 'consteval' compound-statement 'else' statement
-  | 'switch(' init-statement ? condition ')' statement
+selection_statement
+  : if_constexpr ? '(' init_statement ? condition ')' statement
+  | if_constexpr ? '(' init_statement ? condition ')' statement 'else' statement
+  | if_exlamation_mark ? 'consteval' compound_statement
+  | if_exlamation_mark ? 'consteval' compound_statement 'else' statement
+  | 'switch(' init_statement ? condition ')' statement
   ;
 
-iteration-statement
+iteration_statement
   : 'while(' condition ')' statement
   | 'do' statement 'while(' expression ');'
-  | 'for(' init-statement condition ? ';' expression ? ')' statement
-  | 'for(' init-statement ? for-range-declaration ':' for-range-initializer ')' statement
+  | 'for(' init_statement condition ? ';' expression ? ')' statement
+  | 'for(' init_statement ? for_range_declaration ':' for_range_initializer ')' statement
   ;
 
-for-range-declaration
-  : attribute-specifier* decl-specifier-seq declarator
-  | structured-binding-declaration
+for_range_declaration
+  : attribute_specifier* decl_specifier_seq declarator
+  | structured_binding_declaration
   ;
 
-for-range-initializer
-  : expr-or-braced-init-list
+for_range_initializer
+  : expr_or_braced_init_list
   ;
 
-jump-statement
+jump_statement
   : 'break;'
   | 'continue;'
-  | 'return' expr-or-braced-init-list ? ';'
-  | coroutine-return-statement
+  | 'return' expr_or_braced_init_list ? ';'
+  | coroutine_return_statement
   | 'goto' identifier ';'
   ;
 
-coroutine-return-statement
-  : 'co_return' expr-or-braced-init-list ? ';'
+coroutine_return_statement
+  : 'co_return' expr_or_braced_init_list ? ';'
   ;
 
-declaration-statement
-  : block-declaration
+declaration_statement
+  : block_declaration
   ;
 
 //
@@ -1207,91 +1183,91 @@ declaration-statement
 //
 
 declaration
-  : name-declaration
-  | special-declaration
+  : name_declaration
+  | special_declaration
   ;
 
-name-declaration
-  : block-declaration
-  | nodeclspec-function-declaration
-  | function-definition
-  | friend-type-declaration
-  | template-declaration
-  | deduction-guide
-  | linkage-specification
-  | namespace-definition
-  | empty-declaration
-  | attribute-declaration
-  | module-import-declaration
+name_declaration
+  : block_declaration
+  | nodeclspec_function_declaration
+  | function_definition
+  | friend_type_declaration
+  | template_declaration
+  | deduction_guide
+  | linkage_specification
+  | namespace_definition
+  | empty_declaration
+  | attribute_declaration
+  | module_import_declaration
   ;
 
-special-declaration
-  : explicit-instantiation
-  | explicit-specialization
-  | export-declaration
+special_declaration
+  : explicit_instantiation
+  | explicit_specialization
+  | export_declaration
   ;
 
-block-declaration
-  : simple-declaration
-  | asm-declaration
-  | namespace-alias-definition
-  | using-declaration
-  | using-enum-declaration
-  | using-directive
-  | static-assert-declaration
-  | alias-declaration
-  | opaque-enum-declaration
+block_declaration
+  : simple_declaration
+  | asm_declaration
+  | namespace_alias_definition
+  | using_declaration
+  | using_enum_declaration
+  | using_directive
+  | static_assert_declaration
+  | alias_declaration
+  | opaque_enum_declaration
   ;
 
-nodeclspec-function-declaration
-  : attribute-specifier* declarator ';'
+nodeclspec_function_declaration
+  : attribute_specifier* declarator ';'
   ;
 
-alias-declaration
-  : 'using' identifier attribute-specifier* '=' defining-type-id ';'
+alias_declaration
+  : 'using' identifier attribute_specifier* '=' defining_type_id ';'
   ;
 
-attributed-identifier
-  : identifier attribute-specifier*
+attributed_identifier
+  : identifier attribute_specifier*
   ;
 
-attributed-identifier-list
-  : attributed-identifier
-  | attributed-identifier-list ',' attributed-identifier
+attributed_identifier_list
+  : attributed_identifier
+  | attributed_identifier_list ',' attributed_identifier
   ;
 
-structured-binding-declaration
-  : attribute-specifier* decl-specifier-seq ref-qualifier? '[' attributed-identifier-list ']'
+structured_binding_declaration
+  : attribute_specifier* decl_specifier_seq ref_qualifier? '[' attributed_identifier_list ']'
   ;
 
-simple-declaration
-  : decl-specifier-seq init-declarator-list? ';'
-  | attribute-specifier* decl-specifier-seq init-declarator-list ';'
-  | structured-binding-declaration initializer ';'
+simple_declaration
+  : decl_specifier_seq init_declarator_list? ';'
+  | attribute_specifier* decl_specifier_seq init_declarator_list ';'
+  | structured_binding_declaration initializer ';'
   ;
 
-static-assert-message
-  : unevaluated-string
-  | constant-expression
+static_assert_message
+  : unevaluated_string
+  | constant_expression
   ;
 
-static-assert-declaration
-  : 'static-assert(' constant-expression ');'
-  | 'static-assert(' constant-expression ',' static-assert-message ');'
+static_assert_declaration
+  : 'static_assert(' constant_expression ');'
+  | 'static_assert(' constant_expression ',' static_assert_message ');'
   ;
 
-empty-declaration
+empty_declaration
   : ';'
   ;
 
-attribute-declaration
-  : attribute-specifier+ ';'
+attribute_declaration
+  : attribute_specifier+ ';'
   ;
 
-decl-specifier
-  : storage-class-specifier
-  | defining-type-specifier
-  | function-specifier
+decl_specifier
+  : storage_class_specifier
+  | defining_type_specifier
+  | function_specifier
   | 'friend'
   | 'typedef'
   | 'constexpr'
@@ -1300,62 +1276,62 @@ decl-specifier
   | 'inline'
   ;
 
-decl-specifier-seq
-  : decl-specifier attribute-specifier*
-  | decl-specifier decl-specifier-seq
+decl_specifier_seq
+  : decl_specifier attribute_specifier*
+  | decl_specifier decl_specifier_seq
   ;
 
-storage-class-specifier
+storage_class_specifier
   : 'static'
   | 'thread_local'
   | 'extern'
   | 'mutable'
   ;
 
-function-specifier
+function_specifier
   : 'virtual'
-  | explicit-specifier
+  | explicit_specifier
   ;
 
-explicit-specifier
-  : 'explicit(' constant-expression ')'
+explicit_specifier
+  : 'explicit(' constant_expression ')'
   | 'explicit'
   ;
 
-typedef-name
+typedef_name
   : identifier
-  | simple-template-id
+  | simple_template_id
   ;
 
-type-specifier
-  : simple-type-specifier
-  | elaborated-type-specifier
-  | typename-specifier
-  | cv-qualifier
+type_specifier
+  : simple_type_specifier
+  | elaborated_type_specifier
+  | typename_specifier
+  | cv_qualifier
   ;
 
-type-specifier-seq
-  : type-specifier attribute-specifier*
-  | type-specifier type-specifier-seq
+type_specifier_seq
+  : type_specifier attribute_specifier*
+  | type_specifier type_specifier_seq
   ;
 
-defining-type-specifier
-  : type-specifier
-  | class-specifier
-  | enum-specifier
+defining_type_specifier
+  : type_specifier
+  | class_specifier
+  | enum_specifier
   ;
 
-defining-type-specifier-seq
-  : defining-type-specifier attribute-specifier*
-  | defining-type-specifier defining-type-specifier-seq
+defining_type_specifier_seq
+  : defining_type_specifier attribute_specifier*
+  | defining_type_specifier defining_type_specifier_seq
   ;
 
-simple-type-specifier
-  : nested-name-specifier ? type-name
-  | nested-name-specifier 'template' simple-template-id
-  | computed-type-specifier
-  | placeholder-type-specifier
-  | nested-name-specifier ? template-name
+simple_type_specifier
+  : nested_name_specifier ? type_name
+  | nested_name_specifier 'template' simple_template_id
+  | computed_type_specifier
+  | placeholder_type_specifier
+  | nested_name_specifier ? template_name
   | 'char'
   | 'char8_t'
   | 'char16_t'
@@ -1372,412 +1348,412 @@ simple-type-specifier
   | 'void'
   ;
 
-type-name
-  : class-name
-  | enum-name
-  | typedef-name
+type_name
+  : class_name
+  | enum_name
+  | typedef_name
   ;
 
-computed-type-specifier
-  : decltype-specifier
-  | pack-index-specifier
+computed_type_specifier
+  : decltype_specifier
+  | pack_index_specifier
   ;
 
-pack-index-specifier
-  : typedef-name '...[' constant-expression ']'
+pack_index_specifier
+  : typedef_name '...[' constant_expression ']'
   ;
 
-elaborated-type-specifier
-  : class-key attribute-specifier* nested-name-specifier ? identifier
-  | class-key simple-template-id
-  | class-key nested-name-specifier template ? simple-template-id
-  | 'enum' nested-name-specifier ? identifier
+elaborated_type_specifier
+  : class_key attribute_specifier* nested_name_specifier ? identifier
+  | class_key simple_template_id
+  | class_key nested_name_specifier template ? simple_template_id
+  | 'enum' nested_name_specifier ? identifier
   ;
 
-decltype-specifier
+decltype_specifier
   : 'decltype(' expression ')'
   ;
 
-placeholder-type-specifier
-  : type-constraint ? 'auto'
-  | type-constraint ? 'decltype(auto)'
+placeholder_type_specifier
+  : type_constraint ? 'auto'
+  | type_constraint ? 'decltype(auto)'
   ;
 
-init-declarator-list
-  : init-declarator
-  | init-declarator-list ',' init-declarator
+init_declarator_list
+  : init_declarator
+  | init_declarator_list ',' init_declarator
   ;
 
-init-declarator
+init_declarator
   : declarator initializer ?
-  | declarator requires-clause
+  | declarator requires_clause
   ;
 
 declarator
-  : ptr-declarator
-  | noptr-declarator parameters-and-qualifiers trailing-return-type
+  : ptr_declarator
+  | noptr_declarator parameters_and_qualifiers trailing_return_type
   ;
 
-ptr-declarator
-  : noptr-declarator
-  | ptr-operator ptr-declarator
+ptr_declarator
+  : noptr_declarator
+  | ptr_operator ptr_declarator
   ;
 
-noptr-declarator
-  : declarator-id attribute-specifier*
-  | noptr-declarator parameters-and-qualifiers
-  | noptr-declarator '[' constant-expression ? ']' attribute-specifier*
-  | '(' ptr-declarator ')'
+noptr_declarator
+  : declarator_id attribute_specifier*
+  | noptr_declarator parameters_and_qualifiers
+  | noptr_declarator '[' constant_expression ? ']' attribute_specifier*
+  | '(' ptr_declarator ')'
   ;
 
-parameters-and-qualifiers
-  : '(' parameter-declaration-clause ')' cv-qualifier* ref-qualifier ? noexcept-specifier ? attribute-specifier*
+parameters_and_qualifiers
+  : '(' parameter_declaration_clause ')' cv_qualifier* ref_qualifier ? noexcept_specifier ? attribute_specifier*
   ;
 
-trailing-return-type
-  : '->' type-id
+trailing_return_type
+  : '->' type_id
   ;
 
-ptr-operator
-  : '*' attribute-specifier* cv-qualifier*
-  | '&' attribute-specifier*
-  | '&&' attribute-specifier*
-  | nested-name-specifier '*' attribute-specifier* cv-qualifier*
-  | ms-based-modifier ? '*' attribute-specifier* ms-pointer-modifier* cv-qualifier*
-  | ms-based-modifier ? nested-name-specifier '*' attribute-specifier* ms-pointer-modifier* cv-qualifier*
+ptr_operator
+  : '*' attribute_specifier* cv_qualifier*
+  | '&' attribute_specifier*
+  | '&&' attribute_specifier*
+  | nested_name_specifier '*' attribute_specifier* cv_qualifier*
+  | ms_based_modifier ? '*' attribute_specifier* ms_pointer_modifier* cv_qualifier*
+  | ms_based_modifier ? nested_name_specifier '*' attribute_specifier* ms_pointer_modifier* cv_qualifier*
   ;
 
-cv-qualifier
+cv_qualifier
   : 'const'
   | 'volatile'
   ;
 
-ref-qualifier
+ref_qualifier
   : '&'
   | '&&'
   ;
 
-three-dots
+three_dots
   : '...'
   ;
 
-declarator-id
-  : three-dots ? id-expression
+declarator_id
+  : three_dots ? id_expression
   ;
 
-type-id
-  : type-specifier-seq abstract-declarator ?
+type_id
+  : type_specifier_seq abstract_declarator ?
   ;
 
-defining-type-id
-  : defining-type-specifier-seq abstract-declarator ?
+defining_type_id
+  : defining_type_specifier_seq abstract_declarator ?
   ;
 
-abstract-declarator
-  : ptr-abstract-declarator
-  | noptr-abstract-declarator ? parameters-and-qualifiers trailing-return-type
-  | abstract-pack-declarator
+abstract_declarator
+  : ptr_abstract_declarator
+  | noptr_abstract_declarator ? parameters_and_qualifiers trailing_return_type
+  | abstract_pack_declarator
   ;
 
-ptr-abstract-declarator
-  : noptr-abstract-declarator
-  | ptr-operator ptr-abstract-declarator ?
+ptr_abstract_declarator
+  : noptr_abstract_declarator
+  | ptr_operator ptr_abstract_declarator ?
   ;
 
-noptr-abstract-declarator
-  : noptr-abstract-declarator ? parameters-and-qualifiers
-  | noptr-abstract-declarator ? '[' constant-expression ? ']' attribute-specifier*
-  | '(' ptr-abstract-declarator ')'
+noptr_abstract_declarator
+  : noptr_abstract_declarator ? parameters_and_qualifiers
+  | noptr_abstract_declarator ? '[' constant_expression ? ']' attribute_specifier*
+  | '(' ptr_abstract_declarator ')'
   ;
 
-abstract-pack-declarator
-  : noptr-abstract-pack-declarator
-  | ptr-operator abstract-pack-declarator
+abstract_pack_declarator
+  : noptr_abstract_pack_declarator
+  | ptr_operator abstract_pack_declarator
   ;
 
-noptr-abstract-pack-declarator
-  : noptr-abstract-pack-declarator parameters-and-qualifiers
+noptr_abstract_pack_declarator
+  : noptr_abstract_pack_declarator parameters_and_qualifiers
   | '...'
   ;
 
-parameter-declaration-clause
-  : parameter-declaration-list ?  three-dots ?
-  | parameter-declaration-list ', ...'
+parameter_declaration_clause
+  : parameter_declaration_list ?  three_dots ?
+  | parameter_declaration_list ', ...'
   ;
 
-parameter-declaration-list
-  : parameter-declaration
-  | parameter-declaration-list ',' parameter-declaration
+parameter_declaration_list
+  : parameter_declaration
+  | parameter_declaration_list ',' parameter_declaration
   ;
 
 this
   : 'this'
   ;
 
-parameter-declaration
-  : attribute-specifier* this ? decl-specifier-seq declarator
-  | attribute-specifier* decl-specifier-seq declarator '=' initializer-clause
-  | attribute-specifier* this ? decl-specifier-seq abstract-declarator ?
-  | attribute-specifier* decl-specifier-seq abstract-declarator ? '=' initializer-clause
+parameter_declaration
+  : attribute_specifier* this ? decl_specifier_seq declarator
+  | attribute_specifier* decl_specifier_seq declarator '=' initializer_clause
+  | attribute_specifier* this ? decl_specifier_seq abstract_declarator ?
+  | attribute_specifier* decl_specifier_seq abstract_declarator ? '=' initializer_clause
   ;
 
 initializer
-  : brace-or-equal-initializer
-  | '(' expression-list ')'
+  : brace_or_equal_initializer
+  | '(' expression_list ')'
   ;
 
-brace-or-equal-initializer
-  : '=' initializer-clause
-  | braced-init-list
+brace_or_equal_initializer
+  : '=' initializer_clause
+  | braced_init_list
   ;
 
-initializer-clause
-  : assignment-expression
-  | braced-init-list
+initializer_clause
+  : assignment_expression
+  | braced_init_list
   ;
 
 comma
   : ','
   ;
 
-braced-init-list
-  : '{' initializer-list comma ? '}'
-  | '{' designated-initializer-list comma ? '}'
+braced_init_list
+  : '{' initializer_list comma ? '}'
+  | '{' designated_initializer_list comma ? '}'
   | '{}'
   ;
 
-initializer-list
-  : initializer-clause  three-dots ?
-  | initializer-list ',' initializer-clause  three-dots ?
+initializer_list
+  : initializer_clause  three_dots ?
+  | initializer_list ',' initializer_clause  three_dots ?
   ;
 
-designated-initializer-list
-  : designated-initializer-clause
-  | designated-initializer-list ',' designated-initializer-clause
+designated_initializer_list
+  : designated_initializer_clause
+  | designated_initializer_list ',' designated_initializer_clause
   ;
 
-designated-initializer-clause
-  : designator brace-or-equal-initializer
+designated_initializer_clause
+  : designator brace_or_equal_initializer
   ;
 
 designator
   : '.' identifier
   ;
 
-expr-or-braced-init-list
+expr_or_braced_init_list
   : expression
-  | braced-init-list
+  | braced_init_list
   ;
 
-function-definition
-  : attribute-specifier* decl-specifier-seq ? declarator virt-specifier-seq ? function-body
-  | attribute-specifier* decl-specifier-seq ? declarator requires-clause function-body
+function_definition
+  : attribute_specifier* decl_specifier_seq ? declarator virt_specifier_seq ? function_body
+  | attribute_specifier* decl_specifier_seq ? declarator requires_clause function_body
   ;
 
-function-body
-  : ctor-initializer ? compound-statement
-  | function-try-block
+function_body
+  : ctor_initializer ? compound_statement
+  | function_try_block
   | '= default;'
-  | deleted-function-body
+  | deleted_function_body
   ;
 
-deleted-function-body
+deleted_function_body
   : '= delete;'
-  | '= delete(' unevaluated-string ');'
+  | '= delete(' unevaluated_string ');'
   ;
 
-enum-name
+enum_name
   : identifier
   ;
 
-enum-specifier
-  : enum-head '{' enumerator-list ? '}'
-  | enum-head '{' enumerator-list ', }'
+enum_specifier
+  : enum_head '{' enumerator_list ? '}'
+  | enum_head '{' enumerator_list ', }'
   ;
 
-enum-head
-  : enum-key attribute-specifier* enum-head-name ? enum-base ?
+enum_head
+  : enum_key attribute_specifier* enum_head_name ? enum_base ?
   ;
 
-enum-head-name
-  : nested-name-specifier ? identifier
+enum_head_name
+  : nested_name_specifier ? identifier
   ;
 
-opaque-enum-declaration
-  : enum-key attribute-specifier* enum-head-name enum-base ? ';'
+opaque_enum_declaration
+  : enum_key attribute_specifier* enum_head_name enum_base ? ';'
   ;
 
-enum-key
+enum_key
   : 'enum'
   | 'enum class'
   | 'enum struct'
   ;
 
-enum-base
-  : ':' type-specifier-seq
+enum_base
+  : ':' type_specifier_seq
   ;
 
-enumerator-list
-  : enumerator-definition
-  | enumerator-list ',' enumerator-definition
+enumerator_list
+  : enumerator_definition
+  | enumerator_list ',' enumerator_definition
   ;
 
-enumerator-definition
+enumerator_definition
   : enumerator
-  | enumerator '=' constant-expression
+  | enumerator '=' constant_expression
   ;
 
 enumerator
-  : identifier attribute-specifier*
+  : identifier attribute_specifier*
   ;
 
-using-enum-declaration
-  : 'using enum' using-enum-declarator ';'
+using_enum_declaration
+  : 'using enum' using_enum_declarator ';'
   ;
 
-using-enum-declarator
-  : nested-name-specifier ? identifier
-  | nested-name-specifier ? simple-template-id
+using_enum_declarator
+  : nested_name_specifier ? identifier
+  | nested_name_specifier ? simple_template_id
   ;
 
-namespace-name
+namespace_name
   : identifier
-  | namespace-alias
+  | namespace_alias
   ;
 
-namespace-definition
-  : named-namespace-definition
-  | unnamed-namespace-definition
-  | nested-namespace-definition
+namespace_definition
+  : named_namespace_definition
+  | unnamed_namespace_definition
+  | nested_namespace_definition
   ;
 
 inline
   : 'inline'
   ;
 
-nested-inline
+nested_inline
   : ':: inline'
   ;
 
-named-namespace-definition
-  : inline ? 'namespace' attribute-specifier* identifier '{' namespace-body '}'
+named_namespace_definition
+  : inline ? 'namespace' attribute_specifier* identifier '{' namespace_body '}'
   ;
 
-unnamed-namespace-definition
-  : inline ? 'namespace' attribute-specifier* '{' namespace-body '}'
+unnamed_namespace_definition
+  : inline ? 'namespace' attribute_specifier* '{' namespace_body '}'
   ;
 
-nested-namespace-definition
-  : 'namespace' enclosing-namespace-specifier '::' inline ? identifier '{' namespace-body '}'
+nested_namespace_definition
+  : 'namespace' enclosing_namespace_specifier '::' inline ? identifier '{' namespace_body '}'
   ;
 
-enclosing-namespace-specifier
+enclosing_namespace_specifier
   : identifier
-  | enclosing-namespace-specifier '::' inline ? identifier
+  | enclosing_namespace_specifier '::' inline ? identifier
   ;
 
-namespace-body
+namespace_body
   : declaration*
   ;
 
-namespace-alias
+namespace_alias
   : identifier
   ;
 
-namespace-alias-definition
-  : 'namespace' identifier '=' qualified-namespace-specifier ';'
+namespace_alias_definition
+  : 'namespace' identifier '=' qualified_namespace_specifier ';'
   ;
 
-qualified-namespace-specifier
-  : nested-name-specifier ? namespace-name
+qualified_namespace_specifier
+  : nested_name_specifier ? namespace_name
   ;
 
-using-directive
-  : attribute-specifier* 'using namespace' nested-name-specifier ? namespace-name ';'
+using_directive
+  : attribute_specifier* 'using namespace' nested_name_specifier ? namespace_name ';'
   ;
 
-using-declaration
-  : 'using' using-declarator-list ';'
+using_declaration
+  : 'using' using_declarator_list ';'
   ;
 
-using-declarator-list
-  : using-declarator three-dots ?
-  | using-declarator-list ',' using-declarator three-dots ?
+using_declarator_list
+  : using_declarator three_dots ?
+  | using_declarator_list ',' using_declarator three_dots ?
   ;
 
 typename
   : 'typename'
   ;
 
-using-declarator
-  : typename ? nested-name-specifier unqualified-id
+using_declarator
+  : typename ? nested_name_specifier unqualified_id
   ;
 
-asm-declaration
-  : attribute-specifier* 'asm(' balanced-token-seq ');'
+asm_declaration
+  : attribute_specifier* 'asm(' balanced_token_seq ');'
   ;
 
-linkage-specification
-  : 'extern' unevaluated-string '{' declaration* '}'
-  | 'extern' unevaluated-string name-declaration
+linkage_specification
+  : 'extern' unevaluated_string '{' declaration* '}'
+  | 'extern' unevaluated_string name_declaration
   ;
 
-attribute-specifier
+attribute_specifier
+  : '[[' attribute_using_prefix ? attribute_list ']]'
+  | alignment_specifier
+  ;
+
+alignment_specifier
   annotations (separator = ', ', substitute_count='10', description='Some text', dublication='vertical', auto_substitute='yes')
-  : '[[' attribute-using-prefix ? attribute-list ']]'
-  | alignment-specifier
+  : 'alignas(' type_id three_dots ? ')'
+  | 'alignas(' constant_expression three_dots ? ')'
   ;
 
-alignment-specifier
-  : 'alignas(' type-id three-dots ? ')'
-  | 'alignas(' constant-expression three-dots ? ')'
+attribute_using_prefix
+  : 'using' attribute_namespace ':'
   ;
 
-attribute-using-prefix
-  : 'using' attribute-namespace ':'
-  ;
-
-attribute-list
+attribute_list
   : attribute ?
-  | attribute-list ',' attribute ?
+  | attribute_list ',' attribute ?
   | attribute '...'
-  | attribute-list ',' attribute '...'
+  | attribute_list ',' attribute '...'
   ;
 
 attribute
-  : attribute-token attribute-argument-clause ?
+  : attribute_token attribute_argument_clause ?
   ;
 
-attribute-token
+attribute_token
   : identifier
-  | attribute-scoped-token
+  | attribute_scoped_token
   ;
 
-attribute-scoped-token
-  : attribute-namespace '::' identifier
+attribute_scoped_token
+  : attribute_namespace '::' identifier
   ;
 
-attribute-namespace
+attribute_namespace
   : identifier
   ;
 
-attribute-argument-clause
-  : '(' balanced-token-seq ? ')'
+attribute_argument_clause
+  : '(' balanced_token_seq ? ')'
   ;
 
-balanced-token-seq
-  : balanced-token
-  | balanced-token-seq balanced-token
+balanced_token_seq
+  : balanced_token
+  | balanced_token_seq balanced_token
   ;
 
 non_balanced_token
   : '<<<Enter any token other than a parenthesis (), a bracket [], or a brace {}.>>>'
   ;
 
-balanced-token
-  : '(' balanced-token-seq ? ')'
-  | '[' balanced-token-seq ? ']'
-  | '{' balanced-token-seq ? '}'
+balanced_token
+  : '(' balanced_token_seq ? ')'
+  | '[' balanced_token_seq ? ']'
+  | '{' balanced_token_seq ? '}'
   | non_balanced_token
   ;
 
@@ -1785,195 +1761,195 @@ balanced-token
 // A.8 Modules
 //
 
-module-declaration
-  : export-keyword ? module-keyword module-name module-partition ? attribute-specifier* ';'
+module_declaration
+  : export_keyword ? module_keyword module_name module_partition ? attribute_specifier* ';'
   ;
 
-module-name
-  : module-name-qualifier ? identifier
+module_name
+  : module_name_qualifier ? identifier
   ;
 
-module-partition
-  : ':' module-name-qualifier ? identifier
+module_partition
+  : ':' module_name_qualifier ? identifier
   ;
 
-module-name-qualifier
+module_name_qualifier
   : identifier '.'
-  | module-name-qualifier identifier '.'
+  | module_name_qualifier identifier '.'
   ;
 
-export-declaration
-  : 'export' name-declaration
+export_declaration
+  : 'export' name_declaration
   | 'export {' declaration* '}'
-  | export-keyword module-import-declaration
+  | export_keyword module_import_declaration
   ;
 
-module-import-declaration
-  : import-keyword module-name attribute-specifier* ';'
-  | import-keyword module-partition attribute-specifier* ';'
-  | import-keyword header-name attribute-specifier* ';'
+module_import_declaration
+  : import_keyword module_name attribute_specifier* ';'
+  | import_keyword module_partition attribute_specifier* ';'
+  | import_keyword header_name attribute_specifier* ';'
   ;
 
-global-module-fragment
-  : module-keyword ';' declaration*
+global_module_fragment
+  : module_keyword ';' declaration*
   ;
 
-private-module-fragment
-  : module-keyword ': private;' declaration*
+private_module_fragment
+  : module_keyword ': private;' declaration*
   ;
 
 //
 // A.9 Classes
 //
 
-class-name
+class_name
   : identifier
-  | simple-template-id
+  | simple_template_id
   ;
 
-class-specifier
-  : class-head '{' member-specification ? '}'
+class_specifier
+  : class_head '{' member_specification ? '}'
   ;
 
-class-head
-  : class-key attribute-specifier* class-head-name class-virt-specifier ? base-clause ?
-  | class-key attribute-specifier* base-clause ?
+class_head
+  : class_key attribute_specifier* class_head_name class_virt_specifier ? base_clause ?
+  | class_key attribute_specifier* base_clause ?
   ;
 
-class-head-name
-  : nested-name-specifier ? class-name
+class_head_name
+  : nested_name_specifier ? class_name
   ;
 
-class-virt-specifier
+class_virt_specifier
   : 'final'
   ;
 
-class-key
+class_key
   : 'class'
   | 'struct'
   | 'union'
   ;
 
-member-specification
-  : member-declaration member-specification ?
-  | access-specifier ':' member-specification ?
+member_specification
+  : member_declaration member_specification ?
+  | access_specifier ':' member_specification ?
   ;
 
-member-declaration
-  : attribute-specifier* decl-specifier-seq ? member-declarator-list ? ';'
-  | function-definition
-  | friend-type-declaration
-  | using-declaration
-  | using-enum-declaration
-  | static-assert-declaration
-  | template-declaration
-  | explicit-specialization
-  | deduction-guide
-  | alias-declaration
-  | opaque-enum-declaration
-  | empty-declaration
+member_declaration
+  : attribute_specifier* decl_specifier_seq ? member_declarator_list ? ';'
+  | function_definition
+  | friend_type_declaration
+  | using_declaration
+  | using_enum_declaration
+  | static_assert_declaration
+  | template_declaration
+  | explicit_specialization
+  | deduction_guide
+  | alias_declaration
+  | opaque_enum_declaration
+  | empty_declaration
   ;
 
-member-declarator-list
-  : member-declarator
-  | member-declarator-list ',' member-declarator
+member_declarator_list
+  : member_declarator
+  | member_declarator_list ',' member_declarator
   ;
 
-member-declarator
-  : declarator virt-specifier-seq ? pure-specifier ?
-  | declarator requires-clause
-  | declarator brace-or-equal-initializer ?
-  | identifier ? attribute-specifier* ':' constant-expression brace-or-equal-initializer ?
+member_declarator
+  : declarator virt_specifier_seq ? pure_specifier ?
+  | declarator requires_clause
+  | declarator brace_or_equal_initializer ?
+  | identifier ? attribute_specifier* ':' constant_expression brace_or_equal_initializer ?
   ;
 
-virt-specifier-seq
-  : virt-specifier
-  | virt-specifier-seq virt-specifier
+virt_specifier_seq
+  : virt_specifier
+  | virt_specifier_seq virt_specifier
   ;
 
-virt-specifier
+virt_specifier
   : 'override'
   | 'final'
   ;
 
-pure-specifier
+pure_specifier
   : '= 0'
   ;
 
-friend-type-declaration
-  : 'friend' friend-type-specifier-list ';'
+friend_type_declaration
+  : 'friend' friend_type_specifier_list ';'
   ;
 
-friend-type-specifier-list
-  : friend-type-specifier three-dots ?
-  | friend-type-specifier-list ',' friend-type-specifier three-dots ?
+friend_type_specifier_list
+  : friend_type_specifier three_dots ?
+  | friend_type_specifier_list ',' friend_type_specifier three_dots ?
   ;
 
-friend-type-specifier
-  : simple-type-specifier
-  | elaborated-type-specifier
-  | typename-specifier
+friend_type_specifier
+  : simple_type_specifier
+  | elaborated_type_specifier
+  | typename_specifier
   ;
 
-conversion-function-id
-  : 'operator' conversion-type-id
+conversion_function_id
+  : 'operator' conversion_type_id
   ;
 
-conversion-type-id
-  : type-specifier-seq conversion-declarator ?
+conversion_type_id
+  : type_specifier_seq conversion_declarator ?
   ;
 
-conversion-declarator
-  : ptr-operator conversion-declarator ?
+conversion_declarator
+  : ptr_operator conversion_declarator ?
   ;
 
-base-clause
-  : ':' base-specifier-list
+base_clause
+  : ':' base_specifier_list
   ;
 
-base-specifier-list
-  : base-specifier three-dots ?
-  | base-specifier-list ',' base-specifier three-dots ?
+base_specifier_list
+  : base_specifier three_dots ?
+  | base_specifier_list ',' base_specifier three_dots ?
   ;
 
 virtual
   : 'virtual'
   ;
 
-base-specifier
-  : attribute-specifier* class-or-decltype
-  | attribute-specifier* 'virtual' access-specifier ? class-or-decltype
-  | attribute-specifier* access-specifier virtual ? class-or-decltype
+base_specifier
+  : attribute_specifier* class_or_decltype
+  | attribute_specifier* 'virtual' access_specifier ? class_or_decltype
+  | attribute_specifier* access_specifier virtual ? class_or_decltype
   ;
 
-class-or-decltype
-  : nested-name-specifier ? type-name
-  | nested-name-specifier 'template' simple-template-id
-  | decltype-specifier
+class_or_decltype
+  : nested_name_specifier ? type_name
+  | nested_name_specifier 'template' simple_template_id
+  | decltype_specifier
   ;
 
-access-specifier
+access_specifier
   : 'private'
   | 'protected'
   | 'public'
   ;
 
-ctor-initializer
-  : ':' mem-initializer-list
+ctor_initializer
+  : ':' mem_initializer_list
   ;
 
-mem-initializer-list
-  : mem-initializer three-dots ?
-  | mem-initializer-list ',' mem-initializer three-dots ?
+mem_initializer_list
+  : mem_initializer three_dots ?
+  | mem_initializer_list ',' mem_initializer three_dots ?
   ;
 
-mem-initializer
-  : mem-initializer-id '(' expression-list ? ')'
-  | mem-initializer-id braced-init-list
+mem_initializer
+  : mem_initializer_id '(' expression_list ? ')'
+  | mem_initializer_id braced_init_list
   ;
 
-mem-initializer-id
-  : class-or-decltype
+mem_initializer_id
+  : class_or_decltype
   | identifier
   ;
 
@@ -1981,7 +1957,7 @@ mem-initializer-id
 // A.10 Overloading
 //
 
-operator-function-id
+operator_function_id
   : 'operator' operator
   ;
 
@@ -2032,127 +2008,127 @@ operator
   | ','
   ;
 
-literal-operator-id
-  : 'operator' unevaluated-string identifier
-  | 'operator' user-defined-string-literal
+literal_operator_id
+  : 'operator' unevaluated_string identifier
+  | 'operator' user_defined_string_literal
   ;
 
 //
 // A.11 Templates
 //
 
-template-declaration
-  : template-head declaration
-  | template-head concept-definition
+template_declaration
+  : template_head declaration
+  | template_head concept_definition
   ;
 
-template-head
-  : 'template<' template-parameter-list '>' requires-clause ?
+template_head
+  : 'template<' template_parameter_list '>' requires_clause ?
   ;
 
-template-parameter-list
-  : template-parameter
-  | template-parameter-list ',' template-parameter
+template_parameter_list
+  : template_parameter
+  | template_parameter_list ',' template_parameter
   ;
 
-requires-clause
-  : 'requires' constraint-logical-or-expression
+requires_clause
+  : 'requires' constraint_logical_or_expression
   ;
 
-constraint-logical-or-expression
-  : constraint-logical-and-expression
-  | constraint-logical-or-expression '||' constraint-logical-and-expression
+constraint_logical_or_expression
+  : constraint_logical_and_expression
+  | constraint_logical_or_expression '||' constraint_logical_and_expression
   ;
 
-constraint-logical-and-expression
-  : primary-expression
-  | constraint-logical-and-expression '&&' primary-expression
+constraint_logical_and_expression
+  : primary_expression
+  | constraint_logical_and_expression '&&' primary_expression
   ;
 
-template-parameter
-  : type-parameter
-  | parameter-declaration
+template_parameter
+  : type_parameter
+  | parameter_declaration
   ;
 
-type-parameter
-  : type-parameter-key three-dots ? identifier ?
-  | type-parameter-key identifier ? '=' type-id
-  | type-constraint three-dots ? identifier ?
-  | type-constraint identifier ? '=' type-id
-  | template-head type-parameter-key three-dots ? identifier ?
-  | template-head type-parameter-key identifier ? '=' id-expression
+type_parameter
+  : type_parameter_key three_dots ? identifier ?
+  | type_parameter_key identifier ? '=' type_id
+  | type_constraint three_dots ? identifier ?
+  | type_constraint identifier ? '=' type_id
+  | template_head type_parameter_key three_dots ? identifier ?
+  | template_head type_parameter_key identifier ? '=' id_expression
   ;
 
-type-parameter-key
+type_parameter_key
   : 'class'
   | 'typename'
   ;
 
-type-constraint
-  : nested-name-specifier ? concept-name
-  | nested-name-specifier ? concept-name '<' template-argument-list ? '>'
+type_constraint
+  : nested_name_specifier ? concept_name
+  | nested_name_specifier ? concept_name '<' template_argument_list ? '>'
   ;
 
 //
 // A.11
 //
 
-simple-template-id
-  : template-name '<' template-argument-list ? '>'
+simple_template_id
+  : template_name '<' template_argument_list ? '>'
   ;
 
-template-id
-  : simple-template-id
-  | operator-function-id '<' template-argument-list ? '>'
-  | literal-operator-id '<' template-argument-list ? '>'
+template_id
+  : simple_template_id
+  | operator_function_id '<' template_argument_list ? '>'
+  | literal_operator_id '<' template_argument_list ? '>'
   ;
 
-template-name
+template_name
   : identifier
   ;
 
-template-argument-list
-  : template-argument three-dots ?
-  | template-argument-list ',' template-argument three-dots ?
+template_argument_list
+  : template_argument three_dots ?
+  | template_argument_list ',' template_argument three_dots ?
   ;
 
-template-argument
-  : constant-expression
-  | type-id
-  | id-expression
-  | braced-init-list
+template_argument
+  : constant_expression
+  | type_id
+  | id_expression
+  | braced_init_list
   ;
 
-constraint-expression
-  : logical-or-expression
+constraint_expression
+  : logical_or_expression
   ;
 
-deduction-guide
-  : explicit-specifier ? template-name '(' parameter-declaration-clause ')->' simple-template-id ';'
+deduction_guide
+  : explicit_specifier ? template_name '(' parameter_declaration_clause ')->' simple_template_id ';'
   ;
 
-concept-definition
-  : concept concept-name attribute-specifier* '=' constraint-expression ';'
+concept_definition
+  : concept concept_name attribute_specifier* '=' constraint_expression ';'
   ;
 
-concept-name
+concept_name
   : identifier
   ;
 
-typename-specifier
-  : 'typename' nested-name-specifier identifier
-  | 'typename' nested-name-specifier template ? simple-template-id
+typename_specifier
+  : 'typename' nested_name_specifier identifier
+  | 'typename' nested_name_specifier template ? simple_template_id
   ;
 
 extern
   : 'extern'
   ;
 
-explicit-instantiation
+explicit_instantiation
   : extern ? 'template' declaration
   ;
 
-explicit-specialization
+explicit_specialization
   : 'template<>' declaration
   ;
 
@@ -2160,30 +2136,30 @@ explicit-specialization
 // A.12 Exception handling
 //
 
-try-block
-  : 'try' compound-statement handler-seq
+try_block
+  : 'try' compound_statement handler_seq
   ;
 
-function-try-block
-  : 'try' ctor-initializer ? compound-statement handler-seq
+function_try_block
+  : 'try' ctor_initializer ? compound_statement handler_seq
   ;
 
-handler-seq
-  : handler handler-seq ?
+handler_seq
+  : handler handler_seq ?
   ;
 
 handler
-  : 'catch(' exception-declaration ')' compound-statement
+  : 'catch(' exception_declaration ')' compound_statement
   ;
 
-exception-declaration
-  : attribute-specifier* type-specifier-seq declarator
-  | attribute-specifier* type-specifier-seq abstract-declarator ?
+exception_declaration
+  : attribute_specifier* type_specifier_seq declarator
+  | attribute_specifier* type_specifier_seq abstract_declarator ?
   | '...'
   ;
 
-noexcept-specifier
-  : 'noexcept(' constant-expression ')'
+noexcept_specifier
+  : 'noexcept(' constant_expression ')'
   | 'noexcept'
   ;
 
@@ -2191,137 +2167,137 @@ noexcept-specifier
 // A.13 Preprocessing directives
 //
 
-preprocessing-file
+preprocessing_file
   : group ?
-  | module-file
+  | module_file
   ;
 
-module-file
-  : pp-global-module-fragment ? pp-module group ? pp-private-module-fragment ?
+module_file
+  : pp_global_module_fragment ? pp_module group ? pp_private_module_fragment ?
   ;
 
-pp-global-module-fragment
-  : 'module;' new-line group ?
+pp_global_module_fragment
+  : 'module;' new_line group ?
   ;
 
-pp-private-module-fragment
-  : 'module : private;' new-line group ?
+pp_private_module_fragment
+  : 'module : private;' new_line group ?
   ;
 
 group
-  : group-part
-  | group group-part
+  : group_part
+  | group group_part
   ;
 
-group-part
-  : control-line
-  | if-section
-  | text-line
-  | '#' conditionally-supported-directive
+group_part
+  : control_line
+  | if_section
+  | text_line
+  | '#' conditionally_supported_directive
   ;
 
-control-line
-  : '#include' preprocessing-token+ new-line
-  | pp-import
-  | '#define' identifier replacement-list new-line
-  | '#define' identifier lparen identifier* ')' preprocessing-token* new-line
-  | '#define' identifier lparen '...)' preprocessing-token* new-line
-  | '#define' identifier lparen identifier+ ',...)' preprocessing-token* new-line
-  | '#undef' identifier new-line
-  | '#line' preprocessing-token+ new-line
-  | '#error' preprocessing-token* new-line
-  | '#warning' preprocessing-token* new-line
-  | '#pragma' preprocessing-token* new-line
-  | '#' new-line
+control_line
+  : '#include' preprocessing_token+ new_line
+  | pp_import
+  | '#define' identifier replacement_list new_line
+  | '#define' identifier lparen identifier* ')' preprocessing_token* new_line
+  | '#define' identifier lparen '...)' preprocessing_token* new_line
+  | '#define' identifier lparen identifier+ ',...)' preprocessing_token* new_line
+  | '#undef' identifier new_line
+  | '#line' preprocessing_token+ new_line
+  | '#error' preprocessing_token* new_line
+  | '#warning' preprocessing_token* new_line
+  | '#pragma' preprocessing_token* new_line
+  | '#' new_line
   ;
 
-if-section
-  : if-group elif-groups ? else-group ? endif-line
+if_section
+  : if_group elif_groups ? else_group ? endif_line
   ;
 
-if-group
-  : '#if' constant-expression new-line group ?
-  | '#ifdef' identifier new-line group ?
-  | '#ifndef' identifier new-line group ?
+if_group
+  : '#if' constant_expression new_line group ?
+  | '#ifdef' identifier new_line group ?
+  | '#ifndef' identifier new_line group ?
   ;
 
-elif-groups
-  : elif-group
-  | elif-groups elif-group
+elif_groups
+  : elif_group
+  | elif_groups elif_group
   ;
 
-elif-group
-  : '#elif' constant-expression new-line group ?
-  | '#elifdef' identifier new-line group ?
-  | '#elifndef' identifier new-line group ?
+elif_group
+  : '#elif' constant_expression new_line group ?
+  | '#elifdef' identifier new_line group ?
+  | '#elifndef' identifier new_line group ?
   ;
 
-else-group
-  : '#else' new-line group ?
+else_group
+  : '#else' new_line group ?
   ;
 
-endif-line
-  : '#endif' new-line
+endif_line
+  : '#endif' new_line
   ;
 
-text-line
-  : preprocessing-token* new-line
+text_line
+  : preprocessing_token* new_line
   ;
 
-conditionally-supported-directive
-  : preprocessing-token+ new-line
+conditionally_supported_directive
+  : preprocessing_token+ new_line
   ;
 
 lparen
   : '<<<Enter a ( character not immediately preceded by whitespace.>>>'
   ;
 
-new-line
-  : '<<<Enter the new-line \\n character.>>>'
+new_line
+  : '<<<Enter the new_line \\n character.>>>'
   ;
 
-defined-macro-expression
+defined_macro_expression
   : 'defined' identifier
   | 'defined(' identifier ')'
   ;
 
-h-preprocessing-token
-  : '<<<Enter any preprocessing-token other than >.>>>'
+h_preprocessing_token
+  : '<<<Enter any preprocessing_token other than >.>>>'
   ;
 
-header-name-tokens
-  : string-literal
-  | '<' h-preprocessing-token+ '>'
+header_name_tokens
+  : string_literal
+  | '<' h_preprocessing_token+ '>'
   ;
 
-has-include-expression
-  : '__has_include(' header-name ')'
-  | '__has_include(' header-name-tokens ')'
+has_include_expression
+  : '__has_include(' header_name ')'
+  | '__has_include(' header_name_tokens ')'
   ;
 
-has-attribute-expression
-  : '__has_cpp_attribute(' preprocessing-token+ ')'
+has_attribute_expression
+  : '__has_cpp_attribute(' preprocessing_token+ ')'
   ;
 
 export
   : 'export'
   ;
 
-pp-module
-  : export ? 'module' preprocessing-token* ';' new-line
+pp_module
+  : export ? 'module' preprocessing_token* ';' new_line
   ;
 
-pp-import
-  : export ? 'import' header-name preprocessing-token* ';' new-line
-  | export ? 'import' header-name-tokens preprocessing-token* ';' new-line
-  | export ? 'import' preprocessing-token+ ';' new-line
+pp_import
+  : export ? 'import' header_name preprocessing_token* ';' new_line
+  | export ? 'import' header_name_tokens preprocessing_token* ';' new_line
+  | export ? 'import' preprocessing_token+ ';' new_line
   ;
 
-va-replacement
-  : '__VA-OPT__(' preprocessing-token* ')'
+va_replacement
+  : '__VA_OPT__(' preprocessing_token* ')'
   ;
 
-ms-call-modifier
+ms_call_modifier
   : '__cdecl'
   | '__clrcall'
   | '__stdcall'
@@ -2330,11 +2306,11 @@ ms-call-modifier
   | '__vectorcall'
   ;
 
-ms-call-modifier-seq
-  : ms-call-modifier ms-call-modifier-seq ?
+ms_call_modifier_seq
+  : ms_call_modifier ms_call_modifier_seq ?
   ;
 
-ms-pointer-modifier
+ms_pointer_modifier
   : '__restrict'
   | '__uptr'
   | '__sptr'
@@ -2342,6 +2318,6 @@ ms-pointer-modifier
   | '__unaligned'
   ;
 
-ms-declspec-modifier
+ms_declspec_modifier
   : '__declspec(' identifier ')'
   ;
