@@ -39,9 +39,9 @@ def main():
     parser.add_option('-l',
                       '--language',
                       dest = 'language',
-                      default = 'Python',
-                      help = """Set the ELSE language that should be generated."""
-                             """Defaults to Python.""")
+                      default = 'python',
+                      help = """Set the ELSE language that should be generated: python, c++, rust, java,..."""
+                             """Defaults to python.""")
 
     parser.add_option('-b',
                       '--batch-processing',
@@ -252,10 +252,19 @@ Identifier"""
                              """This allows to get control over the final ELSE LSE template file layout."""
                              """Defaults to: False""")
 
+    parser.add_option('-P',
+                      '--print-placeholders',
+                      dest = 'print_placeholders',
+                      default = False,
+                      action="store_true",
+                      help = """If True the program prints the found placeholders to the console."""
+                             """Defaults to False.""")
+
 
     options, args = parser.parse_args(sys.argv[1:])
 
     copyright = options.copyright.format(copyright_holder = options.copyright_holder, copyright_author = options.copyright_author)
+    options.copyright = copyright
 
     # check preconditions:
     if not os.path.exists(options.input_dir):
@@ -269,27 +278,27 @@ Identifier"""
     if options.batch_processing:
         std_languages = [
                      'cmake',
-                     'C++',
-                     'C',
-                     'CSharp',
-                     'Java',
-                     'JavaScript',
-                     'Modelica',
-                     'Php',
-                     'TypeScript',
-                     'ECMAScript',
-                     'Python',
-                     'Pascal',
-                     'Rust',
-                     'Scala',
-                     'Clojure',
-                     'Golang',
-                     'Dot',
-                     'Erlang',
-                     'HTML',
-                     'Prolog',
-                     'RestructuredText',
-                     'Ruby',
+                     'c++',
+                     'c',
+                     'csharp',
+                     'java',
+                     'javascript',
+                     'modelica',
+                     'php',
+                     'typescript',
+                     'ecmascript',
+                     'python',
+                     'pascal',
+                     'rust',
+                     'scala',
+                     'clojure',
+                     'golang',
+                     'dot',
+                     'erlang',
+                     'html',
+                     'prolog',
+                     'restructuredtext',
+                     'ruby',
         ]
 
         std_files = [
@@ -480,7 +489,7 @@ Identifier"""
                     processListener = ProcessListener(options, output, language)
                     walker = ParseTreeWalker()
                     walker.walk(processListener, tree)
-                    processListener.write_else_template()
+                    processListener.write_else_template(options.print_placeholders)
 
         if options.write_placeholders:
             output_file = language + '.lst'

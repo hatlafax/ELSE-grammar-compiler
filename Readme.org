@@ -102,13 +102,34 @@ python Antlr4ToElseCompiler.py -i ./grammars -o ./out -l c++ -p '*(){}[].,;:' -I
 
   The parser allows additional annotations for ELSE in the rule specification by the optional =annotationsSpec= rule.
 
+  | annotation       | value                    | example     | result                         |
+  |------------------+--------------------------+-------------+--------------------------------|
+  | =separator=        | arbitrary                | =", "=        | ~/SEPARATOR=", "~                |
+  |------------------+--------------------------+-------------+--------------------------------|
+  | =substitute-count= | number                   | ="7"=         | ~/SUBSTITUTE_COUNT=7~            |
+  | =substitute_count= | number                   | ="7"=         | ~/SUBSTITUTE_COUNT=7~            |
+  |------------------+--------------------------+-------------+--------------------------------|
+  | =description=      | text                     | ="some text"= | ~/DESCRIPTION="Some text"~       |
+  |------------------+--------------------------+-------------+--------------------------------|
+  | =duplication=      | ~"context-dependent"~,     |             | ~/DUPLICATION=CONTEXT_DEPENDENT~ |
+  |                  | ~"context_dependent"~,     |             | ~/DUPLICATION=CONTEXT_DEPENDENT~ |
+  |                  | ~"context"~,               |             | ~/DUPLICATION=CONTEXT_DEPENDENT~ |
+  |                  | ~"horizontal",~            |             | ~/DUPLICATION=HORIZONTAL~        |
+  |                  | ~"vertical"~               | ="vertical"=  | ~/DUPLICATION=VERTICAL~          |
+  |------------------+--------------------------+-------------+--------------------------------|
+  | =substitute-type=  | ~"auto"~ or other text     | ="auto"=      | ~/AUTO_SUBSTITUTE~               |
+  | =substitute_type=  |                          | ="noauto"=    | ~/NOAUTO_SUBSTITUTE~             |
+  | =auto-substitute=  | ~"1", "true", "on", "yes"~ | ="true"=    | ~/AUTO_SUBSTITUTE~               |
+  | =auto_substitute=  |                          | ="off"=       | ~/NOAUTO_SUBSTITUTE~             |
+  |------------------+--------------------------+-------------+--------------------------------|
+
   Examples: from the c++ grammar
-  
+
   #+begin_example
 attribute-specifier
-  annotations (separator = ', ', substitute_count='10', description='Some text', dublication='vertical', auto_substitute='yes')
+  annotations (separator = ', ', substitute_count='7', description='Some other text', duplication='context', substitute_type='noauto')
   : '[[' attribute-using-prefix ? attribute-list ']]'
-  | alignment-specifier 
+  | alignment-specifier
   ;
   #+end_example
 

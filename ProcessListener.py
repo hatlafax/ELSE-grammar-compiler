@@ -335,7 +335,7 @@ class ProcessListener(ProcessListenerBase):
 
         elif self._annotationKey.lower() == 'duplication':
             duplication_type = ctx.getText()[1:-1].lower()
-            if   duplication_type == 'context_dependent':
+            if   duplication_type == 'context-dependent' or 'context_dependent' or duplication_type == 'context':
                 duplication_type = ElsePlaceholder.DuplicationType.CONTEXT_DEPENDENT
             elif duplication_type == 'vertical':
                 duplication_type = ElsePlaceholder.DuplicationType.VERTICAL
@@ -347,11 +347,20 @@ class ProcessListener(ProcessListenerBase):
 
         elif self._annotationKey.lower() == 'substitute-type' or self._annotationKey.lower() == 'substitute_type':
             substitute_type = ctx.getText()[1:-1].lower()
-            if substitute_type == '1' or auto_substitute == 'yes' or auto_substitute == 'true' or auto_substitute == 'on':
+            if substitute_type == 'auto':
                 substitute_type = ElsePlaceholder.SubstituteType.AUTO_SUBSTITUTE
             else:
                 substitute_type = ElsePlaceholder.SubstituteType.NOAUTO_SUBSTITUTE
             self._dict_placeholders_substitute_type[self._parserRule] = substitute_type
+
+        elif self._annotationKey.lower() == 'auto-substitute' or self._annotationKey.lower() == 'auto_substitute':
+            auto_substitute = ctx.getText()[1:-1].lower()
+            if auto_substitute == '1' or auto_substitute == 'true' or auto_substitute == 'on' or auto_substitute == 'yes':
+                substitute_type = ElsePlaceholder.SubstituteType.AUTO_SUBSTITUTE
+            else:
+                substitute_type = ElsePlaceholder.SubstituteType.NOAUTO_SUBSTITUTE
+            self._dict_placeholders_substitute_type[self._parserRule] = substitute_type
+
 
     # Exit a parse tree produced by ANTLRv4Parser#annotationValue.
     def exitAnnotationValue(self, ctx:ANTLRv4Parser.AnnotationValueContext):
@@ -581,13 +590,14 @@ class ProcessListener(ProcessListenerBase):
         super().exitTerminal(ctx)
 
 
-    def write_else_template(self) -> None:
+    def write_else_template(self, print_placeholders) -> None:
 
-        for p, s in self._dict_placeholders_separators.items():
-            print(f"{p} -> {s}")
+        if print_placeholders:
+          for p, s in self._dict_placeholders_separators.items():
+              print(f"{p} -> {s}")
 
-        for placeholder_name, content in self._dict_placeholders.items():
-            print(f"placeholder_name: {placeholder_name}")
+          for placeholder_name, content in self._dict_placeholders.items():
+              print(f"placeholder_name: {placeholder_name}")
 
         for placeholder_name, content in self._dict_placeholders.items():
             if content is not None and isinstance(content, str) and content.startswith("<<<") and content.endswith(">>>"):

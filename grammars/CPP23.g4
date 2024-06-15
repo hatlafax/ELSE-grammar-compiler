@@ -30,7 +30,7 @@ hexadecimal_digit
   ;
 
 hex_quad
-  : '<<<Enter exactly four hex number characters [0-9a-fA-F], i.e. NNNN.>>>'
+  : '<<<Hiiii Enter exactly four hex number characters [0-9a-fA-F], i.e. NNNN.>>>'
   ;
 
 hex_quad_quad
@@ -1704,7 +1704,7 @@ attribute_specifier
   ;
 
 alignment_specifier
-  annotations (separator = ', ', substitute_count='10', description='Some text', dublication='vertical', auto_substitute='yes')
+  annotations (separator = ', ', substitute_count='10', description='Some text', duplication='vertical', substitute_type='auto')
   : 'alignas(' type_id three_dots ? ')'
   | 'alignas(' constant_expression three_dots ? ')'
   ;
