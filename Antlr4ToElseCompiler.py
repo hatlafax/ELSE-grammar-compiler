@@ -247,7 +247,7 @@ Identifier"""
                       help = """The compiler will read the file 'language.spc'. This file provides character pairs,"""
                              """one in each line that specifify token elements that should not be separated by a"""
                              """space character. E.g. a line entry '},' would cause the compiler to omit the default"""
-                             """space charcter between any two parser elements where the first ends with the curly"""
+                             """space character between any two parser elements where the first ends with the curly"""
                              """bracket character and the second starts with the comma character."""
                              """This allows to get control over the final ELSE LSE template file layout."""
                              """Defaults to: False""")

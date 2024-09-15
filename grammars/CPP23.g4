@@ -30,7 +30,7 @@ hexadecimal_digit
   ;
 
 hex_quad
-  : '<<<Hiiii Enter exactly four hex number characters [0-9a-fA-F], i.e. NNNN.>>>'
+  : '<<<Enter exactly four hex number characters [0-9a-fA-F], i.e. NNNN.>>>'
   ;
 
 hex_quad_quad
@@ -98,33 +98,37 @@ pp_number
   ;
 
 identifier
-  : identifier_start
-  | identifier identifier_continue
+  : '<<<Enter a valid C++ identifier.>>>'
   ;
+
+//identifier
+//  : identifier_start
+//  | identifier identifier_continue
+//  ;
+//
 
 identifier_nondigit
-  : '<<<Enter an identifier that is not a digit.>>>'
+  : '<<<Enter a valid C++ identifier that is not a digit.>>>'
   ;
 
-translation_character_xid_start
-  : '<<<Enter an element of the translation character set with the Unicode property XID_Start.>>>'
-  ;
-
-translation_character_xid_continue
-  : '<<<Enter an element of the translation character set with the Unicode property XID_Continue.>>>'
-  ;
-
-
-identifier_start
-  : nondigit
-  | translation_character_xid_start
-  ;
-
-identifier_continue
-  : digit
-  | nondigit
-  | translation_character_xid_continue
-  ;
+//translation_character_xid_start
+//  : '<<<Enter an element of the translation character set with the Unicode property XID_Start.>>>'
+//  ;
+//
+//translation_character_xid_continue
+//  : '<<<Enter an element of the translation character set with the Unicode property XID_Continue.>>>'
+//  ;
+//
+//identifier_start
+//  : nondigit
+//  | translation_character_xid_start
+//  ;
+//
+//identifier_continue
+//  : digit
+//  | nondigit
+//  | translation_character_xid_continue
+//  ;
 
 nondigit
   : 'a'
@@ -280,6 +284,18 @@ keyword
   | import_keyword
   | module_keyword
   | export_keyword
+  ;
+
+import_keyword
+  : 'import'
+  ;
+
+module_keyword
+  : 'module'
+  ;
+
+export_keyword
+  : 'export'
   ;
 
 preprocessing_op_or_punc

@@ -439,10 +439,13 @@ class ProcessListener(ProcessListenerBase):
 
             alternative = ""
             for element in elements:
-                element =element.strip()
+                element = element.strip()
 
                 le = len(element)
                 la = len(alternative)
+
+                #print(element)
+                #print(alternative)
 
                 non_space_sep = self._options.non_space_separated_map
 
@@ -451,14 +454,31 @@ class ProcessListener(ProcessListenerBase):
                         alternative = element
                     else:
                         found = False
+
                         for lhs, rhs_list in non_space_sep.items():
-                            if alternative.endswith(lhs):
+                            rhs_str = ''.join(rhs_list)
+                            if alternative.endswith(lhs) and rhs_str == '<any>':
+                                found = True
+                            elif alternative.endswith(lhs) and element == rhs_str:
+                                found = True
+                            elif lhs.startswith('regex:'):
+                                lhs_regex = lhs[6:] + '$'
+                                m = re.search(lhs_regex, alternative)
+                                if m:
+                                    if element == str(rhs_list):
+                                        found = True
+                                    else:
+                                        for rhs in rhs_list:
+                                            if element.startswith(rhs):
+                                                found = True
+                            elif alternative.endswith(lhs):
                                 for rhs in rhs_list:
                                     if element.startswith(rhs):
                                         found = True
 
                         if found:
                             alternative += element
+                            print(alternative)
                         else:
                             alternative += " " + element
 
