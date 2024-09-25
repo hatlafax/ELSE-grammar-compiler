@@ -16,13 +16,13 @@ grammar CPP23;
 //
 // A.3 Lexical conventions
 //
-
 n_char
   : '<<<Enter a n_char sequence, that is translation characters except of { or \\n.>>>'
   ;
 
+
 named_universal_character
-  : '\\N{' n_char '}'
+  : '\\N{' NOSPC n_char NOSPC '}'
   ;
 
 hexadecimal_digit
@@ -37,10 +37,15 @@ hex_quad_quad
   : '<<<Enter exactly eight hex number characters [0-9a-fA-F], i.e. NNNNNNNN.>>>'
   ;
 
+//
+// Universal character names are formed by a prefix \U followed by an eight-digit Unicode code point, or by a
+// prefix \u followed by a four-digit Unicode code point. All eight or four digits, respectively, must be present
+// to make a well-formed universal character name.
+//
 universal_character_name
-  : '\\u' hex_quad
-  | '\\U' hex_quad_quad
-  | '\\u{' hexadecimal_digit '}'
+  : '\\u' NOSPC hex_quad
+  | '\\U' NOSPC hex_quad_quad
+  | '\\u{' NOSPC hexadecimal_digit NOSPC '}'
   | named_universal_character
   ;
 
@@ -50,9 +55,9 @@ non_whitespace_character_literal
 
 preprocessing_token
   : header_name
-  | import_keyword
-  | module_keyword
-  | export_keyword
+  | 'import'
+  | 'module'
+  | 'export'
   | identifier
   | pp_number
   | character_literal
@@ -79,22 +84,22 @@ q_char
   ;
 
 header_name
-  : '<' h_char '>'
-  | '"' q_char '"'
+  : '<' NOSPC h_char NOSPC '>'
+  | '"' NOSPC q_char NOSPC '"'
   ;
 
 pp_number
   : digit
-  | '.' digit
-  | pp_number digit
-  | pp_number identifier_nondigit
-  | pp_number '\'' digit
-  | pp_number '\'' nondigit
-  | pp_number 'e' sign
-  | pp_number 'E' sign
-  | pp_number 'p' sign
-  | pp_number 'P' sign
-  | pp_number '.'
+  | '.' NOSPC digit
+  | pp_number NOSPC digit
+  | pp_number NOSPC identifier_nondigit
+  | pp_number NOSPC '\'' NOSPC digit
+  | pp_number NOSPC '\'' NOSPC nondigit
+  | pp_number NOSPC 'e' NOSPC sign
+  | pp_number NOSPC 'E' NOSPC sign
+  | pp_number NOSPC 'p' NOSPC sign
+  | pp_number NOSPC 'P' NOSPC sign
+  | pp_number NOSPC '.'
   ;
 
 identifier
@@ -240,9 +245,11 @@ keyword
   | 'friend'
   | 'goto'
   | 'if'
+  | 'import'
   | 'inline'
   | 'int'
   | 'long'
+  | 'module'
   | 'mutable'
   | 'namespace'
   | 'new'
@@ -281,9 +288,6 @@ keyword
   | 'volatile'
   | 'wchar_t'
   | 'while'
-  | import_keyword
-  | module_keyword
-  | export_keyword
   ;
 
 import_keyword
@@ -378,6 +382,11 @@ operator_or_punctuator
   | 'not_eq'
   ;
 
+
+//
+// Literals are fundamental elements used to represent constant values used in C++ programming language.
+// These constants can include numbers, characters, strings, and more.
+//
 literal
   : integer_literal
   | character_literal
@@ -389,10 +398,10 @@ literal
   ;
 
 integer_literal
-  : binary_literal integer_suffix ?
-  | octal_literal integer_suffix ?
-  | decimal_literal integer_suffix ?
-  | hexadecimal_literal integer_suffix ?
+  : binary_literal NOSPC integer_suffix ?
+  | octal_literal NOSPC integer_suffix ?
+  | decimal_literal NOSPC integer_suffix ?
+  | hexadecimal_literal NOSPC integer_suffix ?
   ;
 
 simple_quote_char
@@ -400,23 +409,23 @@ simple_quote_char
   ;
 
 binary_literal
-  : '0b' binary_digit
-  | '0B' binary_digit
-  | binary_literal simple_quote_char ? binary_digit
+  : '0b' NOSPC binary_digit
+  | '0B' NOSPC binary_digit
+  | binary_literal NOSPC simple_quote_char ? NOSPC binary_digit
   ;
 
 octal_literal
   : '0'
-  | octal_literal simple_quote_char ? octal_digit
+  | octal_literal NOSPC simple_quote_char ? NOSPC octal_digit
   ;
 
 decimal_literal
   : nonzero_digit
-  | decimal_literal simple_quote_char ? digit
+  | decimal_literal NOSPC simple_quote_char ? NOSPC digit
   ;
 
 hexadecimal_literal
-  : hexadecimal_prefix hexadecimal_digit_sequence
+  : hexadecimal_prefix NOSPC hexadecimal_digit_sequence
   ;
 
 binary_digit
@@ -454,16 +463,16 @@ hexadecimal_prefix
 
 hexadecimal_digit_sequence
   : hexadecimal_digit
-  | hexadecimal_digit_sequence simple_quote_char ? hexadecimal_digit
+  | hexadecimal_digit_sequence NOSPC simple_quote_char ? NOSPC hexadecimal_digit
   ;
 
 integer_suffix
-  : unsigned_suffix long_suffix ?
-  | unsigned_suffix long_long_suffix ?
-  | unsigned_suffix size_suffix ?
-  | long_suffix unsigned_suffix ?
-  | long_long_suffix unsigned_suffix ?
-  | size_suffix unsigned_suffix ?
+  : unsigned_suffix  NOSPC long_suffix ?
+  | unsigned_suffix  NOSPC long_long_suffix ?
+  | unsigned_suffix  NOSPC size_suffix ?
+  | long_suffix      NOSPC unsigned_suffix ?
+  | long_long_suffix NOSPC unsigned_suffix ?
+  | size_suffix      NOSPC unsigned_suffix ?
   ;
 
 unsigned_suffix
@@ -486,8 +495,19 @@ size_suffix
   | 'Z'
   ;
 
+//
+// Character literals
+//    auto c0 =   'A'; // char
+//    auto c1 = u8'A'; // char
+//    auto c2 =  L'A'; // wchar_t
+//    auto c3 =  u'A'; // char16_t
+//    auto c4 =  U'A'; // char32_t
+//
+// Multicharacter literals
+//    auto m0 = 'abcd'; // int, value 0x61626364
+//
 character_literal
-  : encoding_prefix ? '\'' c_char+ '\''
+  : encoding_prefix ? NOSPC '\'' NOSPC c_char+ NOSPC '\''
   ;
 
 encoding_prefix
@@ -507,6 +527,24 @@ basic_c_char
   : '<<<Enter a basic source character except the single_quote \', backslash \\, or new_line \\n character.>>>'
   ;
 
+
+//
+// Escape sequences
+//    newline            \n
+//    backslash          \\
+//    horizontal tab     \t
+//    question mark      ? or \?
+//    vertical tab       \v
+//    single quote       \'
+//    backspace          \b
+//    double quote       \"
+//    carriage return    \r
+//    the null character \0
+//    form feed          \f
+//    octal              \ooo
+//    alert (bell)       \a
+//    hexadecimal        \xhhh
+//
 escape_sequence
   : simple_escape_sequence
   | numeric_escape_sequence
@@ -514,7 +552,7 @@ escape_sequence
   ;
 
 simple_escape_sequence
-  : '\\' simple_escape_sequence_char
+  : '\\' NOSPC simple_escape_sequence_char
   ;
 
 simple_escape_sequence_char
@@ -537,19 +575,19 @@ numeric_escape_sequence
   ;
 
 octal_escape_sequence
-  : '\\' octal_digit
-  | '\\' octal_digit octal_digit
-  | '\\' octal_digit octal_digit octal_digit
-  | '\\o{' octal_digit+ '}'
+  : '\\' NOSPC octal_digit
+  | '\\' NOSPC octal_digit NOSPC octal_digit
+  | '\\' NOSPC octal_digit NOSPC octal_digit NOSPC octal_digit
+  | '\\o{' NOSPC octal_digit+ NOSPC '}'
   ;
 
 hexadecimal_escape_sequence
-  : '\\x' hexadecimal_digit
-  | '\\x{' hexadecimal_digit '}'
+  : '\\x' NOSPC hexadecimal_digit
+  | '\\x{' NOSPC hexadecimal_digit NOSPC '}'
   ;
 
 conditional_escape_sequence
-  : '\\' conditional_escape_sequence_char
+  : '\\' NOSPC conditional_escape_sequence_char
   ;
 
 conditional_escape_sequence_char
@@ -562,33 +600,33 @@ floating_point_literal
   ;
 
 decimal_floating_point_literal
-  : fractional_constant exponent_part ? floating_point_suffix ?
-  | digit_sequence exponent_part floating_point_suffix ?
+  : fractional_constant exponent_part ? NOSPC floating_point_suffix ?
+  | digit_sequence NOSPC exponent_part  NOSPC floating_point_suffix ?
   ;
 
 hexadecimal_floating_point_literal
-  : hexadecimal_prefix hexadecimal_fractional_constant binary_exponent_part floating_point_suffix ?
-  | hexadecimal_prefix hexadecimal_digit_sequence binary_exponent_part floating_point_suffix ?
+  : hexadecimal_prefix NOSPC hexadecimal_fractional_constant NOSPC binary_exponent_part NOSPC floating_point_suffix ?
+  | hexadecimal_prefix NOSPC hexadecimal_digit_sequence      NOSPC binary_exponent_part NOSPC floating_point_suffix ?
   ;
 
 fractional_constant
-  : digit_sequence ? '.' digit_sequence
-  | digit_sequence '.'
+  : digit_sequence ? NOSPC '.' NOSPC digit_sequence
+  | digit_sequence   NOSPC '.'
   ;
 
 hexadecimal_fractional_constant
-  : hexadecimal_digit_sequence ? '.' hexadecimal_digit_sequence
-  | hexadecimal_digit_sequence '.'
+  : hexadecimal_digit_sequence ? NOSPC '.' NOSPC hexadecimal_digit_sequence
+  | hexadecimal_digit_sequence   NOSPC '.'
   ;
 
 exponent_part
-  : 'e' sign ? digit_sequence
-  | 'E' sign ? digit_sequence
+  : 'e' NOSPC sign ? NOSPC digit_sequence
+  | 'E' NOSPC sign ? NOSPC digit_sequence
   ;
 
 binary_exponent_part
-  : 'p' sign ? digit_sequence
-  | 'P' sign ? digit_sequence
+  : 'p' NOSPC sign ? NOSPC digit_sequence
+  | 'P' NOSPC sign ? NOSPC digit_sequence
   ;
 
 sign
@@ -598,7 +636,7 @@ sign
 
 digit_sequence
   : digit
-  | digit_sequence simple_quote_char ? digit
+  | digit_sequence NOSPC simple_quote_char ? NOSPC digit
   ;
 
 floating_point_suffix
@@ -618,9 +656,18 @@ floating_point_suffix
   | 'BF16'
   ;
 
+//
+// String literals
+//    auto s0 =   "hello"; // const char*
+//    auto s1 = u8"hello"; // const char* before C++20, encoded as UTF-8,
+//                         // const char8_t* in C++20
+//    auto s2 =  L"hello"; // const wchar_t*
+//    auto s3 =  u"hello"; // const char16_t*, encoded as UTF-16
+//    auto s4 =  U"hello"; // const char32_t*, encoded as UTF-32
+//
 string_literal
-  : encoding_prefix ? '"' s_char* '"'
-  | encoding_prefix ? 'R' raw_string
+  : encoding_prefix ? NOSPC '"' NOSPC s_char* NOSPC '"'
+  | encoding_prefix ? NOSPC 'R' NOSPC raw_string
   ;
 
 s_char
@@ -633,8 +680,20 @@ basic_s_char
   : '<<<Enter a basic source character except the double_quote ", backslash \\, or new_line \\n character.>>>'
   ;
 
+
+//
+// Raw string literals containing unescaped \ and "
+//    auto R0 =   R"("Hello \ world")"; // const char*
+//    auto R1 = u8R"("Hello \ world")"; // const char* before C++20, encoded as UTF-8,
+//                                      // const char8_t* in C++20
+//    auto R2 =  LR"("Hello \ world")"; // const wchar_t*
+//    auto R3 =  uR"("Hello \ world")"; // const char16_t*, encoded as UTF-16
+//    auto R4 =  UR"("Hello \ world")"; // const char32_t*, encoded as UTF-32
+//
+//    auto R5 =   R"_abc_("Hello \ world")_abc_"; // const char*
+//
 raw_string
-  : '"' d_char* '(' r_char* ')' d_char* '"'
+  : '"' NOSPC d_char* NOSPC '(' NOSPC r_char* NOSPC ')' NOSPC d_char* NOSPC '"'
   ;
 
 r_char
@@ -643,6 +702,26 @@ r_char
 
 d_char
   : '<<<Enter a sequence of basic source characters except: space, the left parenthesis (, the right parenthesis ), the backslash \\, and the control characters representing horizontal tab, vertical tab, form feed, and newline.>>>'
+  ;
+
+//
+// An unevaluated_string shall have no encoding_prefix.
+// Each universal_character_name and each simple_escape_sequence in an unevaluated_string is replaced by the
+// member of the translation character set it denotes. An unevaluated_string that contains a numeric_escape_sequence
+// or a conditional_escape_sequence is ill-formed.
+//
+// string_literals can appear in a context where they are not used to initialize a character array, but
+// are used at compile time for diagnostic messages, preprocessing, and other implementation-
+// defined behaviors.
+// A string-literal can appear in _Pragma, asm, extern, static_assert, [[deprecated]] and [[nodiscard]]
+// attributes...
+// In all of these cases, the strings are exclusively used at compile time by the compiler, and are as such not evaluated.
+// This means they should not be converted to the narrow encoding or any literal encoding specified by an encoding
+// prefix (L, u, U, u8).
+//
+unevaluated_string
+  : '"' NOSPC s_char* NOSPC '"'
+  | 'R' NOSPC raw_string
   ;
 
 boolean_literal
@@ -662,25 +741,41 @@ user_defined_literal
   ;
 
 user_defined_integer_literal
-  : decimal_literal ud_suffix
-  | octal_literal ud_suffix
-  | hexadecimal_literal ud_suffix
-  | binary_literal ud_suffix
+  : decimal_literal     NOSPC ud_suffix
+  | octal_literal       NOSPC ud_suffix
+  | hexadecimal_literal NOSPC ud_suffix
+  | binary_literal      NOSPC ud_suffix
   ;
 
 user_defined_floating_point_literal
-  : fractional_constant exponent_part ? ud_suffix
-  | digit_sequence exponent_part ud_suffix
-  | hexadecimal_prefix hexadecimal_fractional_constant binary_exponent_part ud_suffix
-  | hexadecimal_prefix hexadecimal_digit_sequence binary_exponent_part ud_suffix
+  : fractional_constant NOSPC exponent_part ? NOSPC ud_suffix
+  | digit_sequence NOSPC exponent_part        NOSPC ud_suffix
+  | hexadecimal_prefix NOSPC hexadecimal_fractional_constant NOSPC binary_exponent_part NOSPC ud_suffix
+  | hexadecimal_prefix NOSPC hexadecimal_digit_sequence      NOSPC binary_exponent_part NOSPC ud_suffix
   ;
 
+//
+// Combining string literals with standard s-suffix
+//    auto S0 =   "hello"s; // std::string
+//    auto S1 = u8"hello"s; // std::string before C++20, std::u8string in C++20
+//    auto S2 =  L"hello"s; // std::wstring
+//    auto S3 =  u"hello"s; // std::u16string
+//    auto S4 =  U"hello"s; // std::u32string
+//
+// Combining raw string literals with standard s-suffix
+//    auto S5 =   R"("Hello \ world")"s; // std::string from a raw const char*
+//    auto S6 = u8R"("Hello \ world")"s; // std::string from a raw const char* before C++20, encoded as UTF-8,
+//                                       // std::u8string in C++20
+//    auto S7 =  LR"("Hello \ world")"s; // std::wstring from a raw const wchar_t*
+//    auto S8 =  uR"("Hello \ world")"s; // std::u16string from a raw const char16_t*, encoded as UTF-16
+//    auto S9 =  UR"("Hello \ world")"s; // std::u32string from a raw const char32_t*, encoded as UTF-32
+//
 user_defined_string_literal
-  : string_literal ud_suffix
+  : string_literal NOSPC ud_suffix
   ;
 
 user_defined_character_literal
-  : character_literal ud_suffix
+  : character_literal NOSPC ud_suffix
   ;
 
 ud_suffix
@@ -691,6 +786,11 @@ ud_suffix
 // A.4 Basics
 //
 
+//
+// A translation unit is the basic unit of compilation in C++. It consists of the contents of a single source file,
+// plus the contents of any header files directly or indirectly included by it, minus those lines that were ignored
+// using conditional preprocessing statements.
+//
 translation_unit
   : declaration*
   | global_module_fragment ? module_declaration declaration* private_module_fragment ?
@@ -703,7 +803,7 @@ translation_unit
 primary_expression
   : literal
   | 'this'
-  | '(' expression ')'
+  | '(' NOSPC expression NOSPC ')'
   | id_expression
   | lambda_expression
   | fold_expression
@@ -721,8 +821,8 @@ unqualified_id
   | operator_function_id
   | conversion_function_id
   | literal_operator_id
-  | '~' type_name
-  | '~' computed_type_specifier
+  | '~' NOSPC type_name
+  | '~' NOSPC computed_type_specifier
   | template_id
   ;
 
@@ -736,31 +836,31 @@ qualified_id
 
 nested_name_specifier
   : '::'
-  | type_name '::'
-  | namespace_name '::'
-  | computed_type_specifier '::'
-  | nested_name_specifier identifier '::'
-  | nested_name_specifier template ? simple_template_id '::'
+  | type_name NOSPC '::'
+  | namespace_name NOSPC '::'
+  | computed_type_specifier NOSPC '::'
+  | nested_name_specifier identifier NOSPC '::'
+  | nested_name_specifier template ? simple_template_id NOSPC '::'
   ;
 
 pack_index_expression
-  : id_expression '... [' constant_expression ']'
+  : id_expression NOSPC '... [' NOSPC constant_expression NOSPC ']'
   ;
 
 lambda_expression
   : lambda_introducer attribute_specifier* lambda_declarator compound_statement
-  | lambda_introducer '<' template_parameter_list '>' requires_clause ? attribute_specifier* lambda_declarator compound_statement
+  | lambda_introducer NOSPC '<' NOSPC template_parameter_list NOSPC '>' requires_clause ? attribute_specifier* lambda_declarator compound_statement
   ;
 
 lambda_introducer
-  : '[' lambda_capture ? ']'
+  : '[' NOSPC lambda_capture ? NOSPC ']'
   ;
 
 lambda_declarator
   : lambda_specifier+ noexcept_specifier ? attribute_specifier* trailing_return_type ?
   | noexcept_specifier attribute_specifier* trailing_return_type ?
   | trailing_return_type ?
-  | '(' parameter_declaration_clause ')' lambda_specifier* noexcept_specifier ? attribute_specifier* trailing_return_type ? requires_clause ?
+  | '(' NOSPC parameter_declaration_clause NOSPC ')' lambda_specifier* noexcept_specifier ? attribute_specifier* trailing_return_type ? requires_clause ?
   ;
 
 lambda_specifier
@@ -773,7 +873,7 @@ lambda_specifier
 lambda_capture
   : capture_default
   | capture_list
-  | capture_default ',' capture_list
+  | capture_default NOSPC ',' capture_list
   ;
 
 capture_default
@@ -783,7 +883,7 @@ capture_default
 
 capture_list
   : capture
-  | capture_list ',' capture
+  | capture_list NOSPC ',' capture
   ;
 
 capture
@@ -792,8 +892,8 @@ capture
   ;
 
 simple_capture
-  : identifier three_dots ?
-  | '&' identifier three_dots ?
+  : identifier NOSPC three_dots ?
+  | '&' NOSPC identifier NOSPC three_dots ?
   | 'this'
   | '*this'
   ;
@@ -803,14 +903,14 @@ and_three_dots
   ;
 
 init_capture
-  : three_dots ? identifier initializer
-  | and_three_dots ? identifier initializer
+  : three_dots ? NOSPC identifier initializer
+  | and_three_dots ? NOSPC identifier initializer
   ;
 
 fold_expression
-  : '(' cast_expression fold_operator '...)'
-  | '(...' fold_operator cast_expression ')'
-  | '(' cast_expression fold_operator '...' fold_operator cast_expression ')'
+  : '(' NOSPC cast_expression fold_operator NOSPC '...)'
+  | '(...' fold_operator cast_expression NOSPC ')'
+  | '(' NOSPC cast_expression fold_operator NOSPC '...' fold_operator cast_expression ')'
   ;
 
 fold_operator
@@ -853,11 +953,11 @@ requires_expression
   ;
 
 requirement_parameter_list
-  : '(' parameter_declaration_clause ')'
+  : '(' NOSPC parameter_declaration_clause NOSPC ')'
   ;
 
 requirement_body
-  : '{' requirement+ '}'
+  : '{' NOSPC requirement+ NOSPC '}'
   ;
 
 requirement
@@ -868,15 +968,15 @@ requirement
   ;
 
 simple_requirement
-  : expression ';'
+  : expression NOSPC ';'
   ;
 
 type_requirement
-  : 'typename' nested_name_specifier ? type_name ';'
+  : 'typename' nested_name_specifier ? type_name NOSPC ';'
   ;
 
 compound_requirement
-  : '{' expression '}' noexcept ? return_type_requirement ? ';'
+  : '{' NOSPC expression NOSPC '}' noexcept ? return_type_requirement ? NOSPC ';'
   ;
 
 return_type_requirement
@@ -884,7 +984,7 @@ return_type_requirement
   ;
 
 nested_requirement
-  : 'requires' constraint_expression ';'
+  : 'requires' constraint_expression NOSPC ';'
   ;
 
 dot_template
@@ -897,22 +997,22 @@ arrow_template
 
 postfix_expression
   : primary_expression
-  | postfix_expression '[' expression_list ? ']'
-  | postfix_expression '(' expression_list ? ')'
-  | simple_type_specifier '(' expression_list ? ')'
-  | typename_specifier '(' expression_list ? ')'
+  | postfix_expression NOSPC '[' NOSPC expression_list ? NOSPC ']'
+  | postfix_expression NOSPC '(' NOSPC expression_list ? NOSPC ')'
+  | simple_type_specifier NOSPC '(' NOSPC expression_list ? NOSPC ')'
+  | typename_specifier NOSPC '(' NOSPC expression_list ? NOSPC ')'
   | simple_type_specifier braced_init_list
   | typename_specifier braced_init_list
-  | postfix_expression dot_template ? id_expression
-  | postfix_expression arrow_template ? id_expression
-  | postfix_expression '++'
-  | postfix_expression '--'
-  | 'dynamic_cast<' type_id '>(' expression ')'
-  | 'static_cast<' type_id '>(' expression ')'
-  | 'reinterpret_cast<' type_id '>(' expression ')'
-  | 'const_cast<' type_id '>(' expression ')'
-  | 'typeid(' expression ')'
-  | 'typeid(' type_id ')'
+  | postfix_expression NOSPC dot_template ? id_expression
+  | postfix_expression NOSPC arrow_template ? id_expression
+  | postfix_expression NOSPC '++'
+  | postfix_expression NOSPC '--'
+  | 'dynamic_cast<'     NOSPC type_id NOSPC '>(' NOSPC expression NOSPC ')'
+  | 'static_cast<'      NOSPC type_id NOSPC '>(' NOSPC expression NOSPC ')'
+  | 'reinterpret_cast<' NOSPC type_id NOSPC '>(' NOSPC expression NOSPC ')'
+  | 'const_cast<'       NOSPC type_id NOSPC '>(' NOSPC expression NOSPC ')'
+  | 'typeid(' NOSPC expression NOSPC ')'
+  | 'typeid(' NOSPC type_id NOSPC ')'
   ;
 
 expression_list
@@ -922,13 +1022,13 @@ expression_list
 unary_expression
   : postfix_expression
   | unary_operator cast_expression
-  | '++' cast_expression
-  | '--' cast_expression
+  | '++' NOSPC cast_expression
+  | '--' NOSPC cast_expression
   | await_expression
   | 'sizeof' unary_expression
-  | 'sizeof(' type_id ')'
-  | 'sizeof...(' identifier ')'
-  | 'alignof(' type_id ')'
+  | 'sizeof(' NOSPC type_id NOSPC ')'
+  | 'sizeof...(' NOSPC identifier NOSPC ')'
+  | 'alignof(' NOSPC type_id NOSPC ')'
   | noexcept_expression
   | new_expression
   | delete_expression
@@ -948,7 +1048,7 @@ await_expression
   ;
 
 noexcept_expression
-  : 'noexcept(' expression ')'
+  : 'noexcept(' NOSPC expression NOSPC ')'
   ;
 
 nesting_operator
@@ -956,12 +1056,12 @@ nesting_operator
   ;
 
 new_expression
-  : nesting_operator ? 'new' new_placement ? new_type_id new_initializer ?
-  | nesting_operator ? 'new' new_placement ? '(' type_id ')' new_initializer ?
+  : nesting_operator ? 'new' NOSPC new_placement ? NOSPC new_type_id new_initializer ?
+  | nesting_operator ? 'new' NOSPC new_placement ? NOSPC '(' NOSPC type_id NOSPC ')' NOSPC new_initializer ?
   ;
 
 new_placement
-  : '(' expression_list ')'
+  : '(' NOSPC expression_list NOSPC ')'
   ;
 
 new_type_id
@@ -974,12 +1074,12 @@ new_declarator
   ;
 
 noptr_new_declarator
-  : '[' expression ? ']' attribute_specifier*
-  | noptr_new_declarator '[' constant_expression ']' attribute_specifier*
+  : '[' NOSPC expression ? NOSPC ']' attribute_specifier*
+  | noptr_new_declarator NOSPC '[' NOSPC constant_expression NOSPC ']' attribute_specifier*
   ;
 
 new_initializer
-  : '(' expression_list ? ')'
+  : '(' NOSPC expression_list ? NOSPC ')'
   | braced_init_list
   ;
 
@@ -990,13 +1090,13 @@ delete_expression
 
 cast_expression
   : unary_expression
-  | '(' type_id ')' cast_expression
+  | '(' NOSPC type_id NOSPC ')' cast_expression
   ;
 
 pm_expression
   : cast_expression
-  | pm_expression '.*' cast_expression
-  | pm_expression '->*' cast_expression
+  | pm_expression NOSPC '.*' cast_expression
+  | pm_expression NOSPC '->*' cast_expression
   ;
 
 multiplicative_expression
@@ -1099,7 +1199,7 @@ assignment_operator
 
 expression
   : assignment_expression
-  | expression ',' assignment_expression
+  | expression NOSPC ',' assignment_expression
   ;
 
 constant_expression
@@ -1130,7 +1230,7 @@ condition
 
 label
   : attribute_specifier* identifier ':'
-  | attribute_specifier* 'case' constant_expression ':'
+  | attribute_specifier* 'case' constant_expression NOSPC ':'
   | attribute_specifier* 'default:'
   ;
 
@@ -1139,11 +1239,11 @@ labeled_statement
   ;
 
 expression_statement
-  : expression ? ';'
+  : expression ? NOSPC ';'
   ;
 
 compound_statement
-  : '{' statement* label* '}'
+  : '{' NOSPC statement* label* NOSPC '}'
   ;
 
 if_constexpr
@@ -1155,18 +1255,18 @@ if_exlamation_mark
   ;
 
 selection_statement
-  : if_constexpr ? '(' init_statement ? condition ')' statement
-  | if_constexpr ? '(' init_statement ? condition ')' statement 'else' statement
+  : if_constexpr ? '(' NOSPC init_statement ? condition NOSPC ')' statement
+  | if_constexpr ? '(' NOSPC init_statement ? condition NOSPC ')' statement 'else' statement
   | if_exlamation_mark ? 'consteval' compound_statement
   | if_exlamation_mark ? 'consteval' compound_statement 'else' statement
-  | 'switch(' init_statement ? condition ')' statement
+  | 'switch(' NOSPC init_statement ? condition NOSPC ')' statement
   ;
 
 iteration_statement
-  : 'while(' condition ')' statement
-  | 'do' statement 'while(' expression ');'
-  | 'for(' init_statement condition ? ';' expression ? ')' statement
-  | 'for(' init_statement ? for_range_declaration ':' for_range_initializer ')' statement
+  : 'while(' NOSPC condition NOSPC ')' statement
+  | 'do' statement 'while(' NOSPC expression NOSPC ');'
+  | 'for(' NOSPC init_statement condition ? NOSPC ';' expression ? NOSPC ')' statement
+  | 'for(' NOSPC init_statement ? for_range_declaration ':' for_range_initializer NOSPC ')' statement
   ;
 
 for_range_declaration
@@ -1181,13 +1281,13 @@ for_range_initializer
 jump_statement
   : 'break;'
   | 'continue;'
-  | 'return' expr_or_braced_init_list ? ';'
+  | 'return' expr_or_braced_init_list ? NOSPC ';'
   | coroutine_return_statement
-  | 'goto' identifier ';'
+  | 'goto' identifier NOSPC ';'
   ;
 
 coroutine_return_statement
-  : 'co_return' expr_or_braced_init_list ? ';'
+  : 'co_return' expr_or_braced_init_list ? NOSPC ';'
   ;
 
 declaration_statement
@@ -1198,9 +1298,16 @@ declaration_statement
 // A.7 Declarations
 //
 
+//
+// Declarations are how names are introduced (or re-introduced) into the C++ program. Not all declarations actually
+// declare anything, and each kind of entity is declared differently.
+//
+// Definitions are declarations that are sufficient to use the entity identified by the name.
+//
 declaration
   : name_declaration
   | special_declaration
+  | special_declaration_flat
   ;
 
 name_declaration
@@ -1218,10 +1325,18 @@ name_declaration
   ;
 
 special_declaration
-  : explicit_instantiation
-  | explicit_specialization
-  | export_declaration
+  : explicit_instantiation      // 'extern' ? 'template' declaration
+  | explicit_specialization     // 'template<>' declaration
+  | export_declaration          // 'export' ...
   ;
+
+special_declaration_flat
+  : 'extern template' declaration       // explicit_instantiation
+  | 'template' declaration              // explicit_instantiation
+  | 'template<>' declaration            // explicit_specialization
+  | 'export' name_declaration           // export_declaration
+  | 'export {' NOSPC declaration* NOSPC '}'         // export_declaration
+  | 'export' module_import_declaration  // export_declaration
 
 block_declaration
   : simple_declaration
@@ -1236,11 +1351,11 @@ block_declaration
   ;
 
 nodeclspec_function_declaration
-  : attribute_specifier* declarator ';'
+  : attribute_specifier* declarator NOSPC ';'
   ;
 
 alias_declaration
-  : 'using' identifier attribute_specifier* '=' defining_type_id ';'
+  : 'using' identifier attribute_specifier* '=' defining_type_id NOSPC ';'
   ;
 
 attributed_identifier
@@ -1249,17 +1364,17 @@ attributed_identifier
 
 attributed_identifier_list
   : attributed_identifier
-  | attributed_identifier_list ',' attributed_identifier
+  | attributed_identifier_list NOSPC ',' attributed_identifier
   ;
 
 structured_binding_declaration
-  : attribute_specifier* decl_specifier_seq ref_qualifier? '[' attributed_identifier_list ']'
+  : attribute_specifier* decl_specifier_seq ref_qualifier? '[' NOSPC attributed_identifier_list NOSPC ']'
   ;
 
 simple_declaration
-  : decl_specifier_seq init_declarator_list? ';'
-  | attribute_specifier* decl_specifier_seq init_declarator_list ';'
-  | structured_binding_declaration initializer ';'
+  : decl_specifier_seq init_declarator_list? NOSPC ';'
+  | attribute_specifier* decl_specifier_seq init_declarator_list NOSPC ';'
+  | structured_binding_declaration initializer NOSPC ';'
   ;
 
 static_assert_message
@@ -1268,8 +1383,8 @@ static_assert_message
   ;
 
 static_assert_declaration
-  : 'static_assert(' constant_expression ');'
-  | 'static_assert(' constant_expression ',' static_assert_message ');'
+  : 'static_assert(' NOSPC constant_expression NOSPC ');'
+  | 'static_assert(' NOSPC constant_expression NOSPC ',' static_assert_message NOSPC ');'
   ;
 
 empty_declaration
@@ -1277,7 +1392,7 @@ empty_declaration
   ;
 
 attribute_declaration
-  : attribute_specifier+ ';'
+  : attribute_specifier+ NOSPC ';'
   ;
 
 decl_specifier
@@ -1310,7 +1425,7 @@ function_specifier
   ;
 
 explicit_specifier
-  : 'explicit(' constant_expression ')'
+  : 'explicit(' NOSPC constant_expression NOSPC ')'
   | 'explicit'
   ;
 
@@ -1376,7 +1491,7 @@ computed_type_specifier
   ;
 
 pack_index_specifier
-  : typedef_name '...[' constant_expression ']'
+  : typedef_name '...[' NOSPC constant_expression NOSPC ']'
   ;
 
 elaborated_type_specifier
@@ -1387,7 +1502,7 @@ elaborated_type_specifier
   ;
 
 decltype_specifier
-  : 'decltype(' expression ')'
+  : 'decltype(' NOSPC expression NOSPC ')'
   ;
 
 placeholder_type_specifier
@@ -1397,7 +1512,7 @@ placeholder_type_specifier
 
 init_declarator_list
   : init_declarator
-  | init_declarator_list ',' init_declarator
+  | init_declarator_list NOSPC ',' init_declarator
   ;
 
 init_declarator
@@ -1418,12 +1533,12 @@ ptr_declarator
 noptr_declarator
   : declarator_id attribute_specifier*
   | noptr_declarator parameters_and_qualifiers
-  | noptr_declarator '[' constant_expression ? ']' attribute_specifier*
-  | '(' ptr_declarator ')'
+  | noptr_declarator '[' NOSPC constant_expression ? NOSPC ']' attribute_specifier*
+  | '(' NOSPC ptr_declarator NOSPC ')'
   ;
 
 parameters_and_qualifiers
-  : '(' parameter_declaration_clause ')' cv_qualifier* ref_qualifier ? noexcept_specifier ? attribute_specifier*
+  : '(' NOSPC parameter_declaration_clause NOSPC ')' cv_qualifier* ref_qualifier ? noexcept_specifier ? attribute_specifier*
   ;
 
 trailing_return_type
@@ -1431,9 +1546,9 @@ trailing_return_type
   ;
 
 ptr_operator
-  : '*' attribute_specifier* cv_qualifier*
-  | '&' attribute_specifier*
-  | '&&' attribute_specifier*
+  : '*' NOSPC attribute_specifier* cv_qualifier*
+  | '&' NOSPC attribute_specifier*
+  | '&&' NOSPC attribute_specifier*
   | nested_name_specifier '*' attribute_specifier* cv_qualifier*
   | ms_based_modifier ? '*' attribute_specifier* ms_pointer_modifier* cv_qualifier*
   | ms_based_modifier ? nested_name_specifier '*' attribute_specifier* ms_pointer_modifier* cv_qualifier*
@@ -1454,7 +1569,7 @@ three_dots
   ;
 
 declarator_id
-  : three_dots ? id_expression
+  : three_dots ? NOSPC id_expression
   ;
 
 type_id
@@ -1478,8 +1593,8 @@ ptr_abstract_declarator
 
 noptr_abstract_declarator
   : noptr_abstract_declarator ? parameters_and_qualifiers
-  | noptr_abstract_declarator ? '[' constant_expression ? ']' attribute_specifier*
-  | '(' ptr_abstract_declarator ')'
+  | noptr_abstract_declarator ? '[' NOSPC constant_expression ? NOSPC ']' attribute_specifier*
+  | '(' NOSPC ptr_abstract_declarator NOSPC ')'
   ;
 
 abstract_pack_declarator
@@ -1493,13 +1608,13 @@ noptr_abstract_pack_declarator
   ;
 
 parameter_declaration_clause
-  : parameter_declaration_list ?  three_dots ?
-  | parameter_declaration_list ', ...'
+  : parameter_declaration_list ?  NOSPC three_dots ?
+  | parameter_declaration_list NOSPC ', ...'
   ;
 
 parameter_declaration_list
   : parameter_declaration
-  | parameter_declaration_list ',' parameter_declaration
+  | parameter_declaration_list NOSPC ',' parameter_declaration
   ;
 
 this
@@ -1515,7 +1630,7 @@ parameter_declaration
 
 initializer
   : brace_or_equal_initializer
-  | '(' expression_list ')'
+  | '(' NOSPC expression_list NOSPC ')'
   ;
 
 brace_or_equal_initializer
@@ -1533,19 +1648,19 @@ comma
   ;
 
 braced_init_list
-  : '{' initializer_list comma ? '}'
-  | '{' designated_initializer_list comma ? '}'
+  : '{' NOSPC initializer_list NOSPC comma ? NOSPC '}'
+  | '{' NOSPC designated_initializer_list NOSPC comma ? NOSPC '}'
   | '{}'
   ;
 
 initializer_list
-  : initializer_clause  three_dots ?
-  | initializer_list ',' initializer_clause  three_dots ?
+  : initializer_clause  NOSPC three_dots ?
+  | initializer_list NOSPC ',' initializer_clause  NOSPC three_dots ?
   ;
 
 designated_initializer_list
   : designated_initializer_clause
-  | designated_initializer_list ',' designated_initializer_clause
+  | designated_initializer_list NOSPC ',' designated_initializer_clause
   ;
 
 designated_initializer_clause
@@ -1553,7 +1668,7 @@ designated_initializer_clause
   ;
 
 designator
-  : '.' identifier
+  : '.' NOSPC identifier
   ;
 
 expr_or_braced_init_list
@@ -1575,7 +1690,7 @@ function_body
 
 deleted_function_body
   : '= delete;'
-  | '= delete(' unevaluated_string ');'
+  | '= delete(' NOSPC unevaluated_string NOSPC ');'
   ;
 
 enum_name
@@ -1583,8 +1698,8 @@ enum_name
   ;
 
 enum_specifier
-  : enum_head '{' enumerator_list ? '}'
-  | enum_head '{' enumerator_list ', }'
+  : enum_head '{' NOSPC enumerator_list ? NOSPC '}'
+  | enum_head '{' NOSPC enumerator_list NOSPC ', }'
   ;
 
 enum_head
@@ -1596,7 +1711,7 @@ enum_head_name
   ;
 
 opaque_enum_declaration
-  : enum_key attribute_specifier* enum_head_name enum_base ? ';'
+  : enum_key attribute_specifier* enum_head_name enum_base ? NOSPC ';'
   ;
 
 enum_key
@@ -1611,7 +1726,7 @@ enum_base
 
 enumerator_list
   : enumerator_definition
-  | enumerator_list ',' enumerator_definition
+  | enumerator_list NOSPC ',' enumerator_definition
   ;
 
 enumerator_definition
@@ -1624,7 +1739,7 @@ enumerator
   ;
 
 using_enum_declaration
-  : 'using enum' using_enum_declarator ';'
+  : 'using enum' using_enum_declarator NOSPC ';'
   ;
 
 using_enum_declarator
@@ -1652,20 +1767,20 @@ nested_inline
   ;
 
 named_namespace_definition
-  : inline ? 'namespace' attribute_specifier* identifier '{' namespace_body '}'
+  : inline ? 'namespace' attribute_specifier* identifier '{' NOSPC namespace_body NOSPC '}'
   ;
 
 unnamed_namespace_definition
-  : inline ? 'namespace' attribute_specifier* '{' namespace_body '}'
+  : inline ? 'namespace' attribute_specifier* '{' NOSPC namespace_body NOSPC '}'
   ;
 
 nested_namespace_definition
-  : 'namespace' enclosing_namespace_specifier '::' inline ? identifier '{' namespace_body '}'
+  : 'namespace' enclosing_namespace_specifier NOSPC '::' inline ? identifier '{' NOSPC namespace_body NOSPC '}'
   ;
 
 enclosing_namespace_specifier
   : identifier
-  | enclosing_namespace_specifier '::' inline ? identifier
+  | enclosing_namespace_specifier NOSPC '::' inline ? identifier
   ;
 
 namespace_body
@@ -1677,7 +1792,7 @@ namespace_alias
   ;
 
 namespace_alias_definition
-  : 'namespace' identifier '=' qualified_namespace_specifier ';'
+  : 'namespace' identifier '=' qualified_namespace_specifier NOSPC ';'
   ;
 
 qualified_namespace_specifier
@@ -1685,16 +1800,16 @@ qualified_namespace_specifier
   ;
 
 using_directive
-  : attribute_specifier* 'using namespace' nested_name_specifier ? namespace_name ';'
+  : attribute_specifier* 'using namespace' nested_name_specifier ? namespace_name NOSPC ';'
   ;
 
 using_declaration
-  : 'using' using_declarator_list ';'
+  : 'using' using_declarator_list NOSPC ';'
   ;
 
 using_declarator_list
-  : using_declarator three_dots ?
-  | using_declarator_list ',' using_declarator three_dots ?
+  : using_declarator NOSPC three_dots ?
+  | using_declarator_list NOSPC ',' using_declarator NOSPC three_dots ?
   ;
 
 typename
@@ -1706,34 +1821,178 @@ using_declarator
   ;
 
 asm_declaration
-  : attribute_specifier* 'asm(' balanced_token_seq ');'
+  : attribute_specifier* 'asm(' NOSPC balanced_token_seq NOSPC ');'
   ;
 
 linkage_specification
-  : 'extern' unevaluated_string '{' declaration* '}'
+  : 'extern' unevaluated_string '{' NOSPC declaration* NOSPC '}'
   | 'extern' unevaluated_string name_declaration
   ;
 
+
+//
+// Introduces implementation-defined attributes for types, objects, code, etc.
+//
+// Attributes provide the unified standard syntax for implementation-defined language extensions, such as the
+// GNU and IBM language extensions __attribute__((...)), Microsoft extension __declspec(), etc.
+//
+// An attribute can be used almost everywhere in the C++ program, and can be applied to almost everything:
+// to types, to variables, to functions, to names, to code blocks, to entire translation units, although each
+// particular attribute is only valid where it is permitted by the implementation.
+//
+// In declarations, attributes may appear both before the whole declaration and directly after the name of the
+// entity that is declared, in which case they are combined. In most other situations, attributes apply to the
+// directly preceding entity.
+//
+// Besides the standard attributes listed below, implementations may support arbitrary non-standard attributes
+// with implementation-defined behavior. All attributes unknown to an implementation are ignored without causing
+// an error.
+//
+//    [[ attribute-list ]]
+//    [[ using attribute-namespace : attribute-list ]]
+//
+//    where attribute-list is a comma-separated sequence of zero or more attributes
+//    (possibly ending with an ellipsis ... indicating a pack expansion)
+//
+//    [[noreturn]]
+//    [[gnu::unused]]
+//    [[deprecated("because")]]
+//    [[CC::opt(1), CC::debug]]
+//    [[using CC: opt(1), debug]]
+//
+// For some __declspec parameters such as dllimport and dllexport, so far there's no attribute equivalent, so you must
+// continue to use __declspec syntax.
+//
+// Attributes don't affect the type system, and they don't change the meaning of a program. Compilers ignore attribute
+// values they don't recognize.
+//
 attribute_specifier
-  : '[[' attribute_using_prefix ? attribute_list ']]'
+  : '[[' NOSPC attribute_using_prefix ? attribute_list NOSPC ']]'
   | alignment_specifier
+  | standard_attribute_specifier
+  | msvc_attribute_specifier
   ;
 
+standard_attribute_specifier
+  : '[[noreturn]]'                   // Indicates that the function does not return
+                                     // Indicates that the function will not return control flow to the calling function
+                                     //  after it finishes (e.g. functions that terminate the application, throw
+                                     // exceptions, loop indefinitely, etc.).
+                                     // This attribute applies to the name of the function being declared in function
+                                     // declarations only. The behavior is undefined if the function with this attribute
+                                     // actually returns.
+                                     //
+                                     // [[noreturn]] void f() {  throw "error"; // OK }
+                                     //
+  | '[[carries_dependency]]'         // Indicates that dependency chain in release-consume std::memory_order propagates
+                                     // in and out of the function
+  | '[[deprecated]]'                 // Indicates that the use of the name or entity declared with this attribute is
+  | '[[deprecated("reason")]]'       // allowed, but discouraged for some reason.
+                                     //
+                                     // [[deprecated]] void TriassicPeriod() {
+                                     //     std::clog << "Triassic Period: [251.9 - 208.5] million ears ago.\n";
+                                     // }
+  | '[[fallthrough]]'                // Indicates that the fall through from the previous case label is intentional and
+                                     // should not be diagnosed by a compiler that warns on fall-through
+                                     //
+                                     // switch (n) {
+                                     //     case 1:
+                                     //         g();
+                                     //         [[fallthrough]];
+                                     //     case 2:
+                                     //     ...
+                                     //
+  | '[[maybe_unused]]'               // Suppresses compiler warnings on unused entities, if any
+  | '[[nodiscard]]'                  // Encourages the compiler to issue a warning if the return value is discarded
+  | '[[nodiscard("reason")]]'
+  | '[[likely]]'                     // Indicates that the compiler should optimize for the case where a path of execution
+  | '[[unlikely]]'                   // through a statement is more or less likely than any other path of execution
+  | '[[no_unique_address]]'          // Indicates that a non-static data member need not have an address distinct from all
+                                     // other non-static data members of its class. For MSVC us [[msvc::no_unique_address]]
+                                     // instead.
+  | '[assume(expression)]]'          // Specifies that the expression will always evaluate to true at a given point
+  | '[[indeterminate]]'              // Specifies that an object has an indeterminate value if it is not initialized
+  | '[[optimize_for_synchronized]]'  // Indicates that the function definition should be optimized for invocation from a
+                                     // synchronized statement
+  ;
+
+msvc_attribute_specifier
+  : '[[gsl::suppress(rules)]]'       // Used to suppress warnings from checkers that enforce Guidelines Support Library
+                                     // (https://github.com/Microsoft/GSL) rules in code.
+                                     //
+                                     // int main()
+                                     // {
+                                     //     int arr[10]; // GSL warning C26494 will be fired
+                                     //     int* p = arr; // GSL warning C26485 will be fired
+                                     //     [[gsl::suppress(bounds.1)]] // This attribute suppresses Bounds rule #1
+                                     //     {
+                                     //         int* q = p + 1; // GSL warning C26481 suppressed
+                                     //         p = q--; // GSL warning C26481 suppressed
+                                     //     }
+                                     // }
+  | '[[msvc::flatten]]'              // Is very similar to [[msvc::forceinline_calls]]. It will [[msvc::forceinline_calls]]
+                                     // all calls in the scope it's applied to recursively, until no calls are left.
+  | '[[msvc::forceinline]]'          // Has the same meaning as __forceinline
+  | '[[msvc::forceinline_calls]]'    // can be placed on or before a statement or a block. It causes the inline heuristic
+                                     // to attempt to [[msvc::forceinline]] all calls in that statement or block.
+                                     //
+                                     // void f() {
+                                     //     [[msvc::forceinline_calls]]
+                                     //     {
+                                     //         foo();
+                                     //         bar();
+                                     //     }
+                                     //
+  | '[[msvc::intrinsic]]'            // Tells the compiler to inline a metafunction that acts as a named cast from the
+                                     // parameter type to the return type. When the attribute is present on a function
+                                     // definition, the compiler replaces all calls to that function with a simple cast.
+                                     //
+                                     // template <typename T>
+                                     // [[msvc::intrinsic]] T&& my_move(T&& t) { return static_cast<T&&>(t); }
+                                     //
+                                     // void f() {
+                                     //     int i = 0;
+                                     //     i = my_move(i);
+                                     // }
+                                     //
+  | '[[msvc::noinline]]'             // Has the same meaning as __declspec(noinline).
+  | '[[msvc::noinline_calls]]'       // Can be placed before any statement or block, turning off any inlining.
+  | '[[msvc::no_tls_guard]]'         // Disables checks for initialization on first access to thread-local variables in DLLs.
+  | '[[msvc::no_unique_address]]'    // For MSVC to be used instead of [[no_unique_address]]
+  ;
+
+//
+// Specifies the alignment requirement of a type or an object.
+//    alignas( expression)
+//    alignas( type-id   )  // equiva;emt to alignas(alignof( type-id ))
+//    alignas( pack ...  )
+//
+//  struct alignas(float) struct_float { /* your definition here */ };
+//  struct alignas(32) sse_t { float sse_data[4]; };
+//
 alignment_specifier
   annotations (separator = ', ', substitute_count='10', description='Some text', duplication='vertical', substitute_type='auto')
-  : 'alignas(' type_id three_dots ? ')'
-  | 'alignas(' constant_expression three_dots ? ')'
+  : 'alignas(' NOSPC type_id NOSPC three_dots ? NOSPC ')'
+  | 'alignas(' NOSPC constant_expression NOSPC three_dots ? NOSPC ')'
   ;
 
+//
+// In the scope of an attribute list, you can specify the namespace for all names with a single using introducer:
+//
+//    void g() {
+//        [[using rpr: kernel, target(cpu,gpu)]] // equivalent to [[ rpr::kernel, rpr::target(cpu,gpu) ]]
+//        do task();
+//    }
+//
 attribute_using_prefix
-  : 'using' attribute_namespace ':'
+  : 'using' attribute_namespace NOSPC ':'
   ;
 
 attribute_list
   : attribute ?
-  | attribute_list ',' attribute ?
-  | attribute '...'
-  | attribute_list ',' attribute '...'
+  | attribute_list NOSPC ',' attribute ?
+  | attribute NOSPC '...'
+  | attribute_list NOSPC ',' attribute NOSPC '...'
   ;
 
 attribute
@@ -1746,7 +2005,7 @@ attribute_token
   ;
 
 attribute_scoped_token
-  : attribute_namespace '::' identifier
+  : attribute_namespace NOSPC '::' NOSPC identifier
   ;
 
 attribute_namespace
@@ -1754,7 +2013,7 @@ attribute_namespace
   ;
 
 attribute_argument_clause
-  : '(' balanced_token_seq ? ')'
+  : '(' NOSPC balanced_token_seq ? NOSPC ')'
   ;
 
 balanced_token_seq
@@ -1767,9 +2026,9 @@ non_balanced_token
   ;
 
 balanced_token
-  : '(' balanced_token_seq ? ')'
-  | '[' balanced_token_seq ? ']'
-  | '{' balanced_token_seq ? '}'
+  : '(' NOSPC balanced_token_seq ? NOSPC ')'
+  | '[' NOSPC balanced_token_seq ? NOSPC ']'
+  | '{' NOSPC balanced_token_seq ? NOSPC '}'
   | non_balanced_token
   ;
 
@@ -1778,7 +2037,7 @@ balanced_token
 //
 
 module_declaration
-  : export_keyword ? module_keyword module_name module_partition ? attribute_specifier* ';'
+  : export_keyword ? 'module' module_name module_partition ? attribute_specifier* NOSPC ';'
   ;
 
 module_name
@@ -1790,28 +2049,28 @@ module_partition
   ;
 
 module_name_qualifier
-  : identifier '.'
-  | module_name_qualifier identifier '.'
+  : identifier NOSPC '.'
+  | module_name_qualifier identifier NOSPC '.'
   ;
 
 export_declaration
   : 'export' name_declaration
-  | 'export {' declaration* '}'
-  | export_keyword module_import_declaration
+  | 'export {' NOSPC declaration* NOSPC '}'
+  | 'export' module_import_declaration
   ;
 
 module_import_declaration
-  : import_keyword module_name attribute_specifier* ';'
-  | import_keyword module_partition attribute_specifier* ';'
-  | import_keyword header_name attribute_specifier* ';'
+  : 'import' module_name attribute_specifier* NOSPC ';'
+  | 'import' module_partition attribute_specifier* NOSPC ';'
+  | 'import' header_name attribute_specifier* NOSPC ';'
   ;
 
 global_module_fragment
-  : module_keyword ';' declaration*
+  : 'module;' NEWLINE declaration*
   ;
 
 private_module_fragment
-  : module_keyword ': private;' declaration*
+  : 'module: private;' NEWLINE declaration*
   ;
 
 //
@@ -1824,7 +2083,7 @@ class_name
   ;
 
 class_specifier
-  : class_head '{' member_specification ? '}'
+  : class_head '{' NOSPC member_specification ? NOSPC '}'
   ;
 
 class_head
@@ -1848,11 +2107,11 @@ class_key
 
 member_specification
   : member_declaration member_specification ?
-  | access_specifier ':' member_specification ?
+  | access_specifier NOSPC ':' member_specification ?
   ;
 
 member_declaration
-  : attribute_specifier* decl_specifier_seq ? member_declarator_list ? ';'
+  : attribute_specifier* decl_specifier_seq ? member_declarator_list ? NOSPC ';'
   | function_definition
   | friend_type_declaration
   | using_declaration
@@ -1868,20 +2127,63 @@ member_declaration
 
 member_declarator_list
   : member_declarator
-  | member_declarator_list ',' member_declarator
+  | member_declarator_list NOSPC ',' member_declarator
   ;
 
 member_declarator
   : declarator virt_specifier_seq ? pure_specifier ?
   | declarator requires_clause
   | declarator brace_or_equal_initializer ?
-  | identifier ? attribute_specifier* ':' constant_expression brace_or_equal_initializer ?
+  | identifier ? attribute_specifier* NOSPC ':' constant_expression brace_or_equal_initializer ?
   ;
 
 virt_specifier_seq
   : virt_specifier
   | virt_specifier_seq virt_specifier
   ;
+
+test_aaa
+  :
+  | b1 NEWLINE b2 NEWLINE b3
+  | c1 NEWLINE c2 NEWLINE c3
+  | d1 NOSPC d2 NOSPC d3
+  ;
+
+b1
+ : '<<<This is b1>>>'
+ ;
+
+b2
+ : '<<<This is b2>>>'
+ ;
+
+b3
+ : '<<<This is b3>>>'
+ ;
+
+c1
+ : '<<<This is c1>>>'
+ ;
+
+c2
+ : '<<<This is c2>>>'
+ ;
+
+c3
+ : '<<<This is c3>>>'
+ ;
+
+d1
+ : '<<<This is d1>>>'
+ ;
+
+d2
+ : '<<<This is d2>>>'
+ ;
+
+d3
+ : '<<<This is d3>>>'
+ ;
 
 virt_specifier
   : 'override'
@@ -1893,12 +2195,12 @@ pure_specifier
   ;
 
 friend_type_declaration
-  : 'friend' friend_type_specifier_list ';'
+  : 'friend' friend_type_specifier_list NOSPC ';'
   ;
 
 friend_type_specifier_list
-  : friend_type_specifier three_dots ?
-  | friend_type_specifier_list ',' friend_type_specifier three_dots ?
+  : friend_type_specifier NOSPC three_dots ?
+  | friend_type_specifier_list NOSPC ',' friend_type_specifier NOSPC three_dots ?
   ;
 
 friend_type_specifier
@@ -1924,8 +2226,8 @@ base_clause
   ;
 
 base_specifier_list
-  : base_specifier three_dots ?
-  | base_specifier_list ',' base_specifier three_dots ?
+  : base_specifier NOSPC three_dots ?
+  | base_specifier_list NOSPC ',' base_specifier NOSPC three_dots ?
   ;
 
 virtual
@@ -1955,12 +2257,12 @@ ctor_initializer
   ;
 
 mem_initializer_list
-  : mem_initializer three_dots ?
-  | mem_initializer_list ',' mem_initializer three_dots ?
+  : mem_initializer NOSPC three_dots ?
+  | mem_initializer_list NOSPC ',' mem_initializer NOSPC three_dots ?
   ;
 
 mem_initializer
-  : mem_initializer_id '(' expression_list ? ')'
+  : mem_initializer_id NOSPC '(' NOSPC expression_list ? NOSPC ')'
   | mem_initializer_id braced_init_list
   ;
 
@@ -2039,12 +2341,12 @@ template_declaration
   ;
 
 template_head
-  : 'template<' template_parameter_list '>' requires_clause ?
+  : 'template<' NOSPC template_parameter_list NOSPC '>' requires_clause ?
   ;
 
 template_parameter_list
   : template_parameter
-  | template_parameter_list ',' template_parameter
+  | template_parameter_list NOSPC ',' template_parameter
   ;
 
 requires_clause
@@ -2067,11 +2369,11 @@ template_parameter
   ;
 
 type_parameter
-  : type_parameter_key three_dots ? identifier ?
+  : type_parameter_key NOSPC three_dots ? identifier ?
   | type_parameter_key identifier ? '=' type_id
-  | type_constraint three_dots ? identifier ?
+  | type_constraint NOSPC three_dots ? identifier ?
   | type_constraint identifier ? '=' type_id
-  | template_head type_parameter_key three_dots ? identifier ?
+  | template_head type_parameter_key NOSPC three_dots ? identifier ?
   | template_head type_parameter_key identifier ? '=' id_expression
   ;
 
@@ -2082,7 +2384,7 @@ type_parameter_key
 
 type_constraint
   : nested_name_specifier ? concept_name
-  | nested_name_specifier ? concept_name '<' template_argument_list ? '>'
+  | nested_name_specifier ? concept_name NOSPC '<' NOSPC template_argument_list ? NOSPC '>'
   ;
 
 //
@@ -2090,13 +2392,13 @@ type_constraint
 //
 
 simple_template_id
-  : template_name '<' template_argument_list ? '>'
+  : template_name NOSPC '<' NOSPC template_argument_list ? NOSPC '>'
   ;
 
 template_id
   : simple_template_id
-  | operator_function_id '<' template_argument_list ? '>'
-  | literal_operator_id '<' template_argument_list ? '>'
+  | operator_function_id NOSPC '<' NOSPC template_argument_list ? NOSPC '>'
+  | literal_operator_id NOSPC '<' NOSPC template_argument_list ? NOSPC '>'
   ;
 
 template_name
@@ -2104,8 +2406,8 @@ template_name
   ;
 
 template_argument_list
-  : template_argument three_dots ?
-  | template_argument_list ',' template_argument three_dots ?
+  : template_argument NOSPC three_dots ?
+  | template_argument_list NOSPC ',' template_argument NOSPC three_dots ?
   ;
 
 template_argument
@@ -2120,11 +2422,11 @@ constraint_expression
   ;
 
 deduction_guide
-  : explicit_specifier ? template_name '(' parameter_declaration_clause ')->' simple_template_id ';'
+  : explicit_specifier ? template_name NOSPC '(' NOSPC parameter_declaration_clause NOSPC ')->' simple_template_id NOSPC ';'
   ;
 
 concept_definition
-  : concept concept_name attribute_specifier* '=' constraint_expression ';'
+  : concept concept_name attribute_specifier* '=' constraint_expression NOSPC ';'
   ;
 
 concept_name
@@ -2165,7 +2467,7 @@ handler_seq
   ;
 
 handler
-  : 'catch(' exception_declaration ')' compound_statement
+  : 'catch(' NOSPC exception_declaration NOSPC ')' compound_statement
   ;
 
 exception_declaration
@@ -2175,7 +2477,7 @@ exception_declaration
   ;
 
 noexcept_specifier
-  : 'noexcept(' constant_expression ')'
+  : 'noexcept(' NOSPC constant_expression NOSPC ')'
   | 'noexcept'
   ;
 
@@ -2209,7 +2511,7 @@ group_part
   : control_line
   | if_section
   | text_line
-  | '#' conditionally_supported_directive
+  | '#' NOSPC conditionally_supported_directive
   ;
 
 control_line
@@ -2274,7 +2576,7 @@ new_line
 
 defined_macro_expression
   : 'defined' identifier
-  | 'defined(' identifier ')'
+  | 'defined(' NOSPC identifier NOSPC ')'
   ;
 
 h_preprocessing_token
@@ -2283,16 +2585,16 @@ h_preprocessing_token
 
 header_name_tokens
   : string_literal
-  | '<' h_preprocessing_token+ '>'
+  | '<' NOSPC h_preprocessing_token+ NOSPC '>'
   ;
 
 has_include_expression
-  : '__has_include(' header_name ')'
-  | '__has_include(' header_name_tokens ')'
+  : '__has_include(' NOSPC header_name NOSPC ')'
+  | '__has_include(' NOSPC header_name_tokens NOSPC ')'
   ;
 
 has_attribute_expression
-  : '__has_cpp_attribute(' preprocessing_token+ ')'
+  : '__has_cpp_attribute(' NOSPC preprocessing_token+ NOSPC ')'
   ;
 
 export
@@ -2300,17 +2602,17 @@ export
   ;
 
 pp_module
-  : export ? 'module' preprocessing_token* ';' new_line
+  : export ? 'module' preprocessing_token* NOSPC ';' new_line
   ;
 
 pp_import
-  : export ? 'import' header_name preprocessing_token* ';' new_line
-  | export ? 'import' header_name_tokens preprocessing_token* ';' new_line
-  | export ? 'import' preprocessing_token+ ';' new_line
+  : export ? 'import' header_name preprocessing_token* NOSPC ';' new_line
+  | export ? 'import' header_name_tokens preprocessing_token* NOSPC ';' new_line
+  | export ? 'import' preprocessing_token+ NOSPC ';' new_line
   ;
 
 va_replacement
-  : '__VA_OPT__(' preprocessing_token* ')'
+  : '__VA_OPT__(' NOSPC preprocessing_token* NOSPC ')'
   ;
 
 ms_call_modifier
@@ -2335,5 +2637,5 @@ ms_pointer_modifier
   ;
 
 ms_declspec_modifier
-  : '__declspec(' identifier ')'
+  : '__declspec(' NOSPC identifier NOSPC ')'
   ;

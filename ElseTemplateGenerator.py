@@ -1,9 +1,11 @@
 import sys, re, os
 from enum import Enum
 
+from typing import Literal, Optional, TextIO
+
 class ElseLanguage:
-    def __init__(self, output, language: str, punctuation: str, valid_identifier: str, indentation: int, version: str, copyright: str, start_rule: str) -> None:
-        self.output: str = output
+    def __init__(self, output: TextIO, language: str, punctuation: str, valid_identifier: str, indentation: int, version: str, copyright: str, start_rule: str) -> None:
+        self.output: TextIO = output
         self.language: str = language
         self.punctuation: str = punctuation
         self.valid_identifier: str = valid_identifier
@@ -29,7 +31,7 @@ class ElseLanguage:
 class ElsePlaceholder:
     patternPlaceholder = re.compile(r'^[A-Za-z0-9_]+$')
 
-    SubstituteType = Enum("SubstituteType", "AUTO_SUBSTITUTE NOAUTO_SUBSTITUTE")
+    SubstituteType  = Enum("SubstituteType", "AUTO_SUBSTITUTE NOAUTO_SUBSTITUTE")
     DuplicationType = Enum("DuplicationType", "CONTEXT_DEPENDENT VERTICAL HORIZONTAL")
     PlaceHolderType = Enum("PlaceHolderType", "TERMINAL NONTERMINAL MENU")
     PlaceHolderMenuAttribute = Enum("PlaceHolderMenuAttribute", "PLACEHOLDER NOFOLLOW FOLLOW DESCRIPTION")
@@ -40,8 +42,8 @@ class ElsePlaceholder:
         self.initialize()
 
     def initialize(self) -> None:
-        self.placeholder_name: str = None
-        self.placeholder_type: PlaceHolderType = ElsePlaceholder.PlaceHolderType.NONTERMINAL
+        self.placeholder_name: str|None = None
+        self.placeholder_type: ElsePlaceholder.PlaceHolderType = ElsePlaceholder.PlaceHolderType.NONTERMINAL
         self.substitute_type: SubstituteType = ElsePlaceholder.SubstituteType.NOAUTO_SUBSTITUTE
         self.substitute_count: int = 1
         self.description = ""

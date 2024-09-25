@@ -136,6 +136,16 @@ def main():
                              """placeholders content layout."""
                       )
 
+    parser.add_option('--nospace-token',
+                      dest = 'nospace_token',
+                      metavar = 'STRING',
+                      default = "NOSPC",
+                      help = """In order to generate useful ELSE files, additional semantic"""
+                             """tokens for dedentation can be embedded into the grammar."""
+                             """These tokens yield not in placeholders but modify a"""
+                             """placeholders content layout."""
+                      )
+
     copyright = """;; Copyright (C) {copyright_holder}
 ;;
 ;; Author: {copyright_author},

@@ -75,6 +75,8 @@ class ProcessListener(ProcessListenerBase):
                 result = "dedentation-token"
             elif terminal == self._options.newline_token:
                 result = "newline-token"
+            elif terminal == self._options.nospace_token:
+                result = "nospace-token"
             elif terminal in self._options.quotedLexerRuleSpec:
                 terminal = self._options.quotedLexerRuleSpec[terminal]
                 result = terminal[1:-1]
@@ -182,10 +184,16 @@ class ProcessListener(ProcessListenerBase):
 
             indentation = self._options.indentation * " "
 
+            #print(self._options.nospace_token)
+
             lines = re.split(r'\s*newline-token\s*', content)
 
             content = ""
             for idx, line in enumerate(lines):
+
+                if 'nospace-token' in line:
+                    line = re.sub(r'\s*nospace-token\s*', '', line)
+
                 line = re.sub(r'\s*indentation-token\s*', indentation, line)
                 if idx == 0:
                     content += line
@@ -241,10 +249,20 @@ class ProcessListener(ProcessListenerBase):
             for idx in range(len(alternatives)):
                 alternative = alternatives[idx]
 
-                m = ProcessListener.patternMenuPlaceHolder.match(alternative)
-                if m and alternative[1:-1] in self._options.placeholders_set:
-                    alternative = alternative[1:-1]
+                if 'nospace-token' in alternative:
+                    alternative = re.sub(r'\s*nospace-token\s*', '', alternative)
+
+                if 'newline-token' in alternative:
+                    content_str = alternative[0:]
+                    alternative = alternative.replace('newline-token', '\u2218')
+                    self.createElseNonTerminalPlaceholder(alternative, content_str)
+
                     placeholder.add_placeholder_attribute(alternative, ElsePlaceholder.PlaceHolderMenuAttribute.PLACEHOLDER)
+                else:
+                    m = ProcessListener.patternMenuPlaceHolder.match(alternative)
+                    if m and alternative[1:-1] in self._options.placeholders_set:
+                        alternative = alternative[1:-1]
+                        placeholder.add_placeholder_attribute(alternative, ElsePlaceholder.PlaceHolderMenuAttribute.PLACEHOLDER)
 
                 if idx == 0:
                     content += alternative
